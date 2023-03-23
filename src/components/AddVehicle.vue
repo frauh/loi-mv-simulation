@@ -28,6 +28,7 @@
 
 <script>
 import VueModal from '@kouts/vue-modal'
+import Vehicle from "@/logic/Vehicle";
 
 export default {
   name: "AddVehicle",
@@ -38,7 +39,6 @@ export default {
     return {
       showModal: false,
       colors: new Set(),
-      orientations: [0, 45, 90, 135, 180, 225, 270, 315],
       label: "",
       color: "",
       isValid: false
@@ -55,18 +55,7 @@ export default {
     },
     onSubmit(e) {
       e.preventDefault()
-      const vehicle = {
-        id: Math.floor(Math.random() * 100000),
-        color: this.color,
-        label: this.label,
-        isTracked: false,
-        program: "",
-        //TODO Start für position und orientation setzen (für späteren drag and drop)
-        position: {x: Math.floor(Math.random() * 79), y: Math.floor(Math.random() * 80)},
-        //TODO standard Orientierung setzen
-        orientation: this.orientations[Math.floor(Math.random() * this.orientations.length)]
-      }
-      this.$parent.$emit("addVehicle", vehicle)
+      this.$parent.$emit("addVehicle", new Vehicle(this.color, this.label))
       this.showModal = false
     },
     afterClose() {
