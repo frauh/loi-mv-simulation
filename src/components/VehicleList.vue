@@ -43,6 +43,6 @@ export default {
   border-radius: 15px;
   display: block;
   height: 50vh;
-  overflow: scroll;
+  overflow-y: auto;
 }
 </style>

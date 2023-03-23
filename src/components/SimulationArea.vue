@@ -21,6 +21,7 @@ export default {
     calculatePosition() {
       return ""
     },
+    //TODO umschalter zum Terminieren oder Weiterlaufen der Sim beim Erreichen des Randes?
   }
 }
 </script>

@@ -4,7 +4,10 @@
       <SimulationArea :vehicles="vehicles" title="Simulation"/>
     </div>
     <div class="col-middle">
-      <ButtonBar/>
+      <ButtonBar
+          :is-running="isRunning"
+          @runSimulation="runSimulation"
+          @stopSimulation="stopSimulation"/>
     </div>
     <div class="col-right">
       <VehicleList :vehicles="vehicles"
@@ -31,18 +34,19 @@ export default {
     SimulationArea,
     ButtonBar,
     VehicleList,
-    // HeaderComponent,
-    // TaskList,
-    // AddTask
   },
   data() {
     return {
-      vehicles: []
-      // tasks: [],
-      // showAddTask: false
+      vehicles: [],
+      isRunning: false,
     }
   },
   methods: {
+    runSimulation() {
+      this.isRunning = true
+    },stopSimulation() {
+      this.isRunning = false
+    },
     addVehicle(vehicle) {
       this.vehicles = [...this.vehicles, vehicle]
     },
@@ -81,7 +85,7 @@ export default {
 
 [class*="col-"] {
   float: left;
-  padding: 15px;
+  padding: 1vw;
 }
 
 .col-left { /* 8/12 */

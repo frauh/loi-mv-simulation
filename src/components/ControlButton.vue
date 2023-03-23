@@ -30,6 +30,6 @@ export default {
   margin-left: auto;
   margin-right: auto;
   aspect-ratio: 1;
-  font-size: 1vw;
+  font-size: 1.5vw;
 }
 </style>

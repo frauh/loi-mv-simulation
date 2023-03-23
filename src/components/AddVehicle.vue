@@ -137,6 +137,9 @@ export default {
   font-size: 2em;
   border: none;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .submit-button {
