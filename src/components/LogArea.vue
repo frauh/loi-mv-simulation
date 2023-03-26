@@ -27,7 +27,7 @@ export default {
   position: absolute;
   color: steelblue;
   background: white;
-  top: 51vh;
+  top: 51.25vh;
   right: 40px;
 }
 </style>

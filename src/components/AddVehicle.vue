@@ -28,7 +28,7 @@
 
 <script>
 import VueModal from '@kouts/vue-modal'
-import Vehicle from "@/logic/Vehicle";
+import Vehicle from "@/compositions/Vehicle";
 
 export default {
   name: "AddVehicle",

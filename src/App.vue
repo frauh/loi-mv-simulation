@@ -14,6 +14,7 @@
                    title="Fahrzeuge"
                    @addVehicle="addVehicle"
                    @deleteVehicle="deleteVehicle"
+                   @programUpload="programUpload"
                    @toggleTracking="toggleTracking"/>
       <LogArea title="LCD-Log"/>
     </div>
@@ -26,6 +27,8 @@ import SimulationArea from "@/components/SimulationArea.vue";
 import ButtonBar from "@/components/ButtonBar.vue";
 import VehicleList from "@/components/VehicleList.vue";
 import LogArea from "@/components/LogArea.vue";
+import Vehicle from "@/compositions/Vehicle";
+import readMakeCodeFile from "@/compositions/FileHandler";
 
 export default {
   name: "App",
@@ -37,14 +40,15 @@ export default {
   },
   data() {
     return {
-      vehicles: [],
+      vehicles: [new Vehicle("red", "test")],
       isRunning: false,
     }
   },
   methods: {
     runSimulation() {
       this.isRunning = true
-    },stopSimulation() {
+    },
+    stopSimulation() {
       this.isRunning = false
     },
     addVehicle(vehicle) {
@@ -54,7 +58,16 @@ export default {
       this.vehicles = this.vehicles.filter((vehicle) => vehicle.id !== id)
     },
     toggleTracking(id) {
-      this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {...vehicle, isTracked: !vehicle.isTracked} : vehicle)
+      this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {
+        ...vehicle,
+        isTracked: !vehicle.isTracked
+      } : vehicle)
+    },
+    async programUpload(id, file) {
+      await readMakeCodeFile(file).then(result => this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {
+        ...vehicle,
+        program: result
+      } : vehicle));
     }
   }
 }

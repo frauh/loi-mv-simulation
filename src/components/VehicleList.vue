@@ -24,7 +24,7 @@ export default {
     title: String,
     vehicles: Array
   },
-  emits: ["addVehicle", "toggleTracking", "deleteVehicle"] //TODO upload file
+  emits: ["addVehicle", "toggleTracking", "deleteVehicle", "programUpload"]
 }
 </script>
 

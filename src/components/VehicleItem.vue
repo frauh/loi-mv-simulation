@@ -1,32 +1,39 @@
 <template>
-  <div>
+  <div class="container">
     <label class="label" for="row">{{ vehicle.label }}</label>
-  </div>
-  <div id="row" class="row">
-    <div class="img-container">
-      <img :alt="`${vehicle.color}`" :src="require(`@/assets/side-${vehicle.color}.png`)">
-    </div>
-    <div class="button-group">
-      <!-- TODO file upload -->
-      <!-- TODO dropZone  -->
-      <!-- TODO Hochgladene Datei (Name?) anzeigen -->
-      <ControlButton color="orange"
-                     description="Programm hochladen"
-                     icon="fas fa-file-arrow-up"/>
-      <ToggleButton description-disabled="Fahrstrecke anzeigen"
-                    description-enabled="Fahrstrecke ausblenden"
-                    icon="fas fa-shuffle"
-                    :is-enabled="vehicle.isTracked"
-                    @toggle="$emit('toggleTracking')"/>
-      <ControlButton color="red"
-                     description="Fahrzeug löschen"
-                     icon="fas fa-trash-can"
-                     @btn-click="showDeleteModal=true"/>
+    <div id="row" class="row">
+      <div class="img-container">
+        <img :alt="`${vehicle.color}`" :src="require(`@/assets/side-${vehicle.color}.png`)">
+      </div>
+      <div class="button-group">
+        <!-- TODO file upload -->
+        <!-- TODO dropZone  -->
+        <!-- TODO Hochgladene Datei (Name?) anzeigen -->
+        <input id="fileInput"
+               ref="fileInput"
+               accept=".hex"
+               hidden
+               type="file"
+               @input="handleFileUpload">
+        <ControlButton color="orange"
+                       description="Programm hochladen"
+                       icon="fas fa-file-arrow-up"
+                       @btn-click="selectFile"/>
+        <ToggleButton :is-enabled="vehicle.isTracked"
+                      description-disabled="Fahrstrecke anzeigen"
+                      description-enabled="Fahrstrecke ausblenden"
+                      icon="fas fa-shuffle"
+                      @toggle="$emit('toggleTracking')"/>
+        <ControlButton color="red"
+                       description="Fahrzeug löschen"
+                       icon="fas fa-trash-can"
+                       @btn-click="showDeleteModal=true"/>
+      </div>
     </div>
   </div>
   <VueModal v-model="showDeleteModal" title="Bitte bestätigen">
     <div>
-      <label>Möchtest du das Fahrzeug "{{vehicle.label}}" wirklich löschen?</label>
+      <label>Möchtest du das Fahrzeug "{{ vehicle.label }}" wirklich löschen?</label>
       <div class="modal-button-group">
         <button class="submit-button" @click="$emit('deleteVehicle')">Ja, löschen</button>
         <button class="close-button" @click="showDeleteModal=false">Nein</button>
@@ -49,19 +56,39 @@ export default {
   },
   data() {
     return {
-      showDeleteModal: false
+      showDeleteModal: false,
     }
   },
   props: {
     vehicle: Object
   },
-  emits: ["toggleTracking", "deleteVehicle"]
+  emits: ["toggleTracking", "deleteVehicle", "programUpload"],
+  methods: {
+    selectFile() {
+      this.$refs.fileInput.click();
+    },
+    handleFileUpload() {
+      this.$parent.$emit("programUpload", this.vehicle.id, this.$refs.fileInput.files[0]);
+      document.getElementById("fileInput").value = "";
+    }
+  }
 }
 </script>
 
 <style scoped>
+.container * {
+  padding: 5px;
+  float: left;
+}
+
+.container:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 .label {
-  margin-bottom: -30px;
+  margin-bottom: -25px;
   margin-left: 5px;
   font-weight: bold;
   color: steelblue;
@@ -71,17 +98,6 @@ export default {
   border-bottom: 3px solid lightsteelblue;
   display: flex;
   align-items: center;
-}
-
-.row * {
-  padding: 5px;
-  float: left;
-}
-
-.row:after {
-  content: "";
-  clear: both;
-  display: table;
 }
 
 .button-group {
@@ -138,6 +154,7 @@ export default {
   margin-left: 0;
   background: crimson;
 }
+
 .close-button {
   margin-right: 0;
   background: steelblue;
