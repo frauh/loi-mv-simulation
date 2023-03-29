@@ -10,6 +10,7 @@ export default {
   props: {
     title: String
   }
+  //TODO log löschen, wenn Simulation (neu) startet, bzw zurückgesetzt wird
 }
 </script>
 

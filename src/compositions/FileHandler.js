@@ -2,7 +2,12 @@ import {LZMA} from "lzma/src/lzma-d"
 
 const MAIN_TS = "main.ts";
 
-export default function readMakeCodeFile(file) {
+/**
+ * Liest die hochgeladene Datei ein, um daraus den in MakeCode geschriebenen Code zu extratieren
+ * @param file direkt aus dem Input als '.hex'
+ * @returns {Promise<String>} typescript
+ */
+export default function readMakeCodeFileAsynchronous(file) {
     return new Promise(resolve => {
         if (!file) {
             console.error("Keine Datei zum Hochladen gefunden.")
@@ -11,7 +16,7 @@ export default function readMakeCodeFile(file) {
         if (file.name.endsWith("hex")) {
             readFileAsBufferAsynchronous(file).then(data => {
                 readHexFile(data)
-                    .then(result => resolve(result.source[MAIN_TS].split("\n")))
+                    .then(result => resolve(result.source[MAIN_TS]))
                     .catch(e => console.error("Datei konnte nicht erkannt werden.", e))
             });
         } else {
@@ -21,6 +26,11 @@ export default function readMakeCodeFile(file) {
     });
 }
 
+/**
+ * FileReader liest die Datei ein
+ * @param file
+ * @returns {Promise<unknown>} Uint8Array
+ */
 function readFileAsBufferAsynchronous(file) {
     return new Promise((resolve) => {
         let fileReader = new FileReader();
@@ -30,6 +40,11 @@ function readFileAsBufferAsynchronous(file) {
     });
 }
 
+/**
+ * Liest die Hex-Datei aus und sucht nach dem darin enthaltenen Code
+ * @param byteArray Uint8Array
+ * @returns {Promise<never>|Promise<{source: (string|string)}>|Promise<unknown>} Header und Inhalt getrennt
+ */
 function readHexFile(byteArray) {
     function promiseError(msg) {
         console.error(msg);
@@ -88,6 +103,12 @@ function readHexFile(byteArray) {
     }
 }
 
+/**
+ * Übersetzt Hexadezimalcode der Datei, um diese weiterzuverarbeiten
+ * Sucht nach dem Header, um diesen zuerst zu lesen, da darin das weitere Vorgehen festgelegt wird.
+ * @param hexFile
+ * @returns {undefined|{meta: (string|string), text: Uint8Array}}
+ */
 function extractCode(hexFile) {
 
     function swapBytes(string) {
@@ -143,6 +164,11 @@ function extractCode(hexFile) {
     }
 }
 
+/**
+ * Decodiert utf8-bytes, sucht zuerst nach Sonderzeichen
+ * @param binaryString
+ * @returns {string}
+ */
 function decodeFromUTF8Bytes(binaryString) {
     if (!binaryString) {
         return "";
@@ -159,6 +185,11 @@ function decodeFromUTF8Bytes(binaryString) {
     return decodeURIComponent(escaped);
 }
 
+/**
+ * Dekomprimiert mit dem LZM-Algorithmus
+ * @param buffer
+ * @returns {Promise<unknown>} String
+ */
 function decompressLzmaAsynchronous(buffer) {
     return new Promise((resolve) => {
         try {
