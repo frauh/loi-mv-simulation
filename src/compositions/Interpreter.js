@@ -1,19 +1,30 @@
-import Basic from "@/compositions/makeCodeMapper/Basic";
-import Input from "@/compositions/makeCodeMapper/Input";
-import Music from "@/compositions/makeCodeMapper/Music";
-import Led from "@/compositions/makeCodeMapper/Led";
-import Radio from "@/compositions/makeCodeMapper/Radio";
-import Loops from "@/compositions/makeCodeMapper/Loops";
-import LoiMv from "@/compositions/makeCodeMapper/LoiMv";
-import I2cLcd from "@/compositions/makeCodeMapper/I2cLcd";
-import Neopixel from "@/compositions/makeCodeMapper/Neopixel";
+import BasicMapper from "@/compositions/makeCodeMapper/BasicMapper";
+import InputMapper from "@/compositions/makeCodeMapper/InputMapper";
+import MusicMapper from "@/compositions/makeCodeMapper/MusicMapper";
+import LedMapper from "@/compositions/makeCodeMapper/LedMapper";
+import RadioMapper from "@/compositions/makeCodeMapper/RadioMapper";
+import LoopsMapper from "@/compositions/makeCodeMapper/LoopsMapper";
+import LoiMvMapper from "@/compositions/makeCodeMapper/LoiMvMapper";
+import I2cLcdMapper from "@/compositions/makeCodeMapper/I2cLcdMapper";
+import NeopixelMapper from "@/compositions/makeCodeMapper/NeopixelMapper";
+import BasicSimulator from "@/compositions/simulator/BasicSimulator";
+import InputSimulator from "@/compositions/simulator/InputSimulator";
+import MusicSimulator from "@/compositions/simulator/MusicSimulator";
+import RadioSimulator from "@/compositions/simulator/RadioSimulator";
+import LedSimulator from "@/compositions/simulator/LedSimulator";
+import LoopsSimulator from "@/compositions/simulator/LoopsSimulator";
+import LoiMvSimulator from "@/compositions/simulator/LoiMvSimulator";
+import I2cLcdSimulator from "@/compositions/simulator/I2cLcdSimulator";
+import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
 
 export default class Interpreter {
 
     _vehicle;
+    _logArea;
 
-    constructor(vehicle) {
+    constructor(vehicle, logArea) {
         this._vehicle = vehicle;
+        this._logArea = logArea;
     }
 
     /**
@@ -22,21 +33,22 @@ export default class Interpreter {
      * Achtung: Sicherheitsrisiko
      */
     startSimulation() {
+        //TODO while isRunning
         //TODO escape entrypoint oder als event verarbeiten
         //FIXME Aufruf später mit try/catch
 
-        const basic = new Basic(this._vehicle);
-        const input = new Input(this._vehicle);
-        const music = new Music(this._vehicle);
-        const led = new Led(this._vehicle);
-        const radio = new Radio(this._vehicle);
-        const loops = new Loops(this._vehicle);
-        const LOI_MV = new LoiMv(this._vehicle);
-        const I2C_LCD1602 = new I2cLcd(this._vehicle);
-        const neopixel = new Neopixel(this._vehicle);
-        this.useVariable(basic, input, music, led, radio, loops, LOI_MV, I2C_LCD1602, neopixel)
+        const basic = new BasicMapper(new BasicSimulator(this._vehicle, this._logArea));
+        const input = new InputMapper(new InputSimulator(this._vehicle));
+        const music = new MusicMapper(new MusicSimulator(this._vehicle));
+        const led = new LedMapper(new LedSimulator(this._vehicle));
+        const radio = new RadioMapper(new RadioSimulator(this._vehicle));
+        const loops = new LoopsMapper(new LoopsSimulator(this._vehicle));
+        const LOI_MV = new LoiMvMapper(new LoiMvSimulator(this._vehicle));
+        const I2C_LCD1602 = new I2cLcdMapper(new I2cLcdSimulator(this._vehicle, this._logArea));
+        const neopixel = new NeopixelMapper(new NeopixelSimulator(this._vehicle));
+        this.useVariable(basic, input, music, led, radio, loops, LOI_MV, I2C_LCD1602, neopixel);
 
-        this._vehicle.previousStartPose = this._vehicle.pose;
+        this._vehicle.previousStartPose = this._vehicle.pose;//TODO wohin auslagern?
         this._vehicle.simulationStartTime = Date.now();
 
         eval(this._vehicle.program);
@@ -45,7 +57,7 @@ export default class Interpreter {
     /**
      * Damit die Mapper nicht als "unused variables" gelten und der Code kompiliert
      */
-    useVariable (...mapper) {
+    useVariable(...mapper) {
         return mapper
     }
 }
@@ -55,7 +67,7 @@ export default class Interpreter {
  */
 
 /*
-Basic
+BasicSimulator
  */
 
 export const DigitalPin = {
@@ -150,7 +162,7 @@ export const ArrowNames = {
 }
 
 /*
-Input
+InputMapper
  */
 
 export const Button = {
@@ -189,7 +201,7 @@ export const AcceleratorRange = {
 }
 
 /*
-Music
+MusicMapper
  */
 
 export const MusicEvent = {
@@ -249,7 +261,7 @@ export const DisplayMode = {
 }
 
 /*
-Radio
+RadioMapper
  */
 
 export const RadioPacketProperty = {
@@ -353,7 +365,7 @@ export const EventBusValue = {
 }
 
 /*
-Neopixel
+NeopixelMapper
  */
 
 export const NeoPixelColors = {

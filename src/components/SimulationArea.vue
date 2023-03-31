@@ -1,5 +1,5 @@
 <template>
-  <div class="area">
+  <div class="container">
     <div class="list">
       <!-- TODO canvas-->
       <div class="img-container" v-for="vehicle in vehicles" :key="vehicle.id">
@@ -35,7 +35,7 @@ export default {
   left: 40px;
 }
 
-.area {
+.container {
   overflow: hidden;
   margin: auto;
   height: 100%;

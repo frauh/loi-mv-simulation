@@ -7,7 +7,8 @@
             <ButtonBar
                     :is-running="isRunning"
                     @runSimulation="runSimulation"
-                    @stopSimulation="stopSimulation"/>
+                    @stopSimulation="stopSimulation"
+                    @resetSimulation="resetSimulation"/>
         </div>
         <div class="col-right">
             <VehicleList :vehicles="vehicles"
@@ -16,7 +17,7 @@
                          @deleteVehicle="deleteVehicle"
                          @programUpload="programUpload"
                          @toggleTracking="toggleTracking"/>
-            <LogArea title="LCD-Log"/>
+            <LogArea ref="logArea" title="Log"/>
         </div>
     </div>
   <!-- https://www.youtube.com/watch?v=qZXt1Aom3Cs -->
@@ -42,23 +43,30 @@ export default {
     data() {
         return {
             vehicles: [],
-            isRunning: false,
+            objects: [],
+            isRunning: false
         }
     },
     created() {
-        this.vehicles.push(new Vehicle("red", "test"));
+        let vehicle = new Vehicle("red", "test");
+        // vehicle.program = "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nbasic.pause(2000)\nLOI_MV.antrieb(0, 0)\n";
+        this.vehicles.push(vehicle);
     },
     methods: {
         runSimulation() {
             this.isRunning = true
             this.vehicles.forEach(vehicle => {
-                let interpreter = new Interpreter(vehicle);
+                let interpreter = new Interpreter(vehicle, this.$refs.logArea);
                 interpreter.startSimulation();
-                //TODO webworker
+                //TODO webworker bzw. prozesse
             })
         },
-        stopSimulation() {
-            this.isRunning = false
+        stopSimulation() {//TODO
+            this.isRunning = false;
+        },
+        resetSimulation() {//TODO
+            this.isRunning = false;
+            this.$refs.logArea.$data.output = "";
         },
         addVehicle(vehicle) {
             this.vehicles = [...this.vehicles, vehicle]
@@ -70,9 +78,10 @@ export default {
             this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {
                 ...vehicle,
                 isTracked: !vehicle.isTracked
-            } : vehicle)
+            } : vehicle);
         },
         async programUpload(id, file) {
+            this.isRunning = false;
             await readMakeCodeFileAsynchronous(file).then(result => this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {
                 ...vehicle,
                 program: result
@@ -95,8 +104,23 @@ export default {
     -moz-osx-font-smoothing: grayscale;
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px darkgray;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: gray;
+    border-radius: 5px;
+}
+
 * {
     box-sizing: border-box;
+    scrollbar-width: thin;
 }
 
 .row::after {

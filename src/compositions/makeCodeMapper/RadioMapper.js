@@ -1,9 +1,9 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Funk' für micro:bit V1
  */
-export default class Radio extends MakeCodeMapper {
+export default class RadioMapper extends Mapper {
 
     /**
      * wenn Zahl empfangen

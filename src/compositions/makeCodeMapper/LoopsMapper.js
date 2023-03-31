@@ -1,9 +1,9 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Schleifen' für micro:bit V1
  */
-export default class Loops extends MakeCodeMapper {
+export default class LoopsMapper extends Mapper {
 
     /**
      * alle ... ms

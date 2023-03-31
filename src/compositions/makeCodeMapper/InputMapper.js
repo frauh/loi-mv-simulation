@@ -1,10 +1,10 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 import {Rotation} from "@/compositions/Interpreter";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Eingabe' für micro:bit V1
  */
-export default class Input extends MakeCodeMapper {
+export default class InputMapper extends Mapper {
 
     /**
      * Wenn Knopf geklickt
@@ -150,10 +150,10 @@ export default class Input extends MakeCodeMapper {
     }
 
     #simulateRotation() {
-        return this._vehicle.pose.theta * (180/Math.PI) + 90;
+        return this._simulator.pose.theta * (180/Math.PI) + 90;
     }
 
     #simulateRunningTime() {
-        return Date.now() - this._vehicle.simulationStartTime;
+        return Date.now() - this._simulator.simulationStartTime;
     }
 }

@@ -1,10 +1,10 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
- * Alle MakeCode Funktionen aus dem Reiter 'Neopixel' für micro:bit V1
+ * Alle MakeCode Funktionen aus dem Reiter 'NeopixelMapper' für micro:bit V1
  * vgl. https://github.com/microsoft/pxt-neopixel/blob/master/neopixel.ts
  */
-export default class Neopixel extends MakeCodeMapper {
+export default class NeopixelMapper extends Mapper {
 
     /**
      * setze Strip auf
@@ -13,7 +13,7 @@ export default class Neopixel extends MakeCodeMapper {
      * @param mode NeoPixelMode
      */
     create(pin, numLeds, mode) {
-        this.unused(pin, numLeds, mode);
+        this.unused("NeopixelMapper.setzeStrip", pin, numLeds, mode);
         return new Strip();
     }
 
@@ -24,7 +24,7 @@ export default class Neopixel extends MakeCodeMapper {
      * @param l
      */
     hsl(h, s, l) {
-        this.notSupported("Neopixel.HSL-Farbe", h, s, l);
+        this.notSupported("NeopixelMapper.HSL-Farbe", h, s, l);
     }
 
     /**
@@ -42,12 +42,12 @@ export default class Neopixel extends MakeCodeMapper {
      * @param blue number
      */
     rgb(red, green, blue) {
-        this.notSupported("Neopixel.rgb", red, green, blue);
+        this.notSupported("NeopixelMapper.rgb", red, green, blue);
     }
 
 }
 
-class Strip extends MakeCodeMapper {
+class Strip extends Mapper {
 
     constructor() {
         super();
@@ -59,7 +59,7 @@ class Strip extends MakeCodeMapper {
      * @param length number
      */
     range(start, length) {
-        this.unused(start, length);
+        this.unused("NeopixelMapper.setzeRangeAuf", start, length);
     }
 
     /**
@@ -68,7 +68,7 @@ class Strip extends MakeCodeMapper {
      * @param endHue number
      */
     showRainbow(startHue, endHue) {
-        this.notSupported("Neopixel.zeigeRegenbogenfarben", startHue, endHue);
+        this.notSupported("NeopixelMapper.zeigeRegenbogenfarben", startHue, endHue);
     }
 
     /**
@@ -86,21 +86,21 @@ class Strip extends MakeCodeMapper {
      * @param high
      */
     showBarGraph(value, high) {
-        this.notSupported("Neopixel.zeigeBalkendiagramm", value, high);
+        this.notSupported("NeopixelMapper.zeigeBalkendiagramm", value, high);
     }
 
     /**
      * strip anzeigen
      */
     show() {
-        this.notSupported("Neopixel.anzeigen");
+        this.notSupported("NeopixelMapper.anzeigen");
     }
 
     /**
      * strip ausschalten
      */
     clear() {
-        this.notSupported("Neopixel.ausschalten");
+        this.notSupported("NeopixelMapper.ausschalten");
     }
 
     /**
@@ -108,7 +108,7 @@ class Strip extends MakeCodeMapper {
      * @param offset
      */
     shift(offset) {
-        this.notSupported("Neopixel.verschiebeNeopixel", offset);
+        this.notSupported("NeopixelMapper.verschiebeNeopixel", offset);
     }
 
     /**
@@ -116,7 +116,7 @@ class Strip extends MakeCodeMapper {
      * @param offset
      */
     rotate(offset) {
-        this.notSupported("Neopixel.rotiereNeopixel", offset);
+        this.notSupported("NeopixelMapper.rotiereNeopixel", offset);
     }
 
     /**
@@ -125,7 +125,7 @@ class Strip extends MakeCodeMapper {
      * @param white number
      */
     setPixelWhiteLED(pixelOffset, white) {
-        this.notSupported("Neopixel.setzeWeißeLedVonNeopixel", pixelOffset, white);
+        this.notSupported("NeopixelMapper.setzeWeißeLedVonNeopixel", pixelOffset, white);
     }
 
     /**
@@ -134,14 +134,14 @@ class Strip extends MakeCodeMapper {
      * @param rgb number
      */
     setPixelColor(pixelOffset, rgb) {
-        this.notSupported("Neopixel.setzeFarbevonNeopixel", pixelOffset, rgb);
+        this.notSupported("NeopixelMapper.setzeFarbevonNeopixel", pixelOffset, rgb);
     }
 
     /**
      * strip Länge
      */
     length() {
-        this.notSupported("Neopixel.länge");
+        this.notSupported("NeopixelMapper.länge");
     }
 
     /**
@@ -149,21 +149,21 @@ class Strip extends MakeCodeMapper {
      * @param brightness number
      */
     setBrightness(brightness) {
-        this.notSupported("Neopixel.setzeHelligkeit", brightness);
+        this.notSupported("NeopixelMapper.setzeHelligkeit", brightness);
     }
 
     /**
      * abdunkeln
      */
     easeBrightness() {
-        this.notSupported("Neopixel.abdunkeln");
+        this.notSupported("NeopixelMapper.abdunkeln");
     }
 
     /**
      * Stromverbrauch (mA)
      */
     power() {
-        this.notSupported("Neopixel.stromverbrauch");
+        this.notSupported("NeopixelMapper.stromverbrauch");
     }
 
     /**
@@ -171,7 +171,7 @@ class Strip extends MakeCodeMapper {
      * @param width number
      */
     setMatrixWidth(width) {
-        this.notSupported("Neopixel.setzeMatrixBreite", width);
+        this.notSupported("NeopixelMapper.setzeMatrixBreite", width);
     }
 
     /**
@@ -181,6 +181,6 @@ class Strip extends MakeCodeMapper {
      * @param rgb number
      */
     setMatrixColor(x, y, rgb) {
-        this.notSupported("Neopixel.setzeMatrixFarbeAnPosition", x, y, rgb);
+        this.notSupported("NeopixelMapper.setzeMatrixFarbeAnPosition", x, y, rgb);
     }
 }

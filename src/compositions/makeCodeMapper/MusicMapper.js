@@ -1,9 +1,9 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Musik' für micro:bit V1
  */
-export default class Music extends MakeCodeMapper {
+export default class MusicMapper extends Mapper {
 
     /**
      * Wenn Musik

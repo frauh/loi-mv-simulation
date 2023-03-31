@@ -8,7 +8,7 @@ export default class Vehicle {
     program = "";
     pose = {x: 0, y: 0, theta: 0};
     previousStartPose = {x: 0, y: 0, theta: 0};
-    simulationStartTime = 0;
+    simulationStartTime = 0;//TODO gehört eigentlich raus
 
     constructor(color, label) {
         this.id = Math.floor(Math.random() * 100000);

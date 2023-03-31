@@ -1,18 +1,16 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'LCD1602_I2C' für micro:bit V1
  */
-export default class I2cLcd extends MakeCodeMapper {
-
-    _display = ["", ""];
+export default class I2cLcdMapper extends Mapper {
 
     /**
      * LCD initialize with Address
      * @param addr number
      */
     LcdInit(addr) {
-        this.unused(addr)
+        this.unused("I2cLcdMapper.lcdInitializeWithAddress", addr);
         // nothing to do
     }
 
@@ -23,7 +21,7 @@ export default class I2cLcd extends MakeCodeMapper {
      * @param y number
      */
     ShowString(s, x, y) {
-        this.#simulateLCD(s, x, y);
+        this._simulator.simulateLCD(s, x, y);
     }
 
     /**
@@ -33,14 +31,14 @@ export default class I2cLcd extends MakeCodeMapper {
      * @param y number
      */
     ShowNumber(n, x, y) {
-        this.#simulateLCD(n.toString(), x, y);
+        this._simulator.simulateLCD(n.toString(), x, y);
     }
 
     /**
      * clear LCD
      */
     clear() {
-        // nothing to do
+        this._simulator.simulateClearLcd();
     }
 
     /**
@@ -85,10 +83,5 @@ export default class I2cLcd extends MakeCodeMapper {
         this.notSupported("LCD1602_I2C.shiftRight")
     }
 
-    #simulateLCD(value, x, y) {
-        this._display[y] = [this._display[y].slice(0, x), value].join("")
-        //TODO log
-        console.log(this._display.join("\n"));
-    }
 
 }

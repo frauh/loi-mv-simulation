@@ -1,10 +1,11 @@
-import MakeCodeMapper from "@/compositions/makeCodeMapper/MakeCodeMapper";
+import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Grundlagen' für micro:bit V1
  * 'Beim Start' wird nicht beachtet, da dieses im Javascript an erster Stelle steht
  */
-export default class Basic extends MakeCodeMapper {
+export default class BasicMapper extends Mapper {
+
 
     /**
      * dauerhaft
@@ -20,7 +21,7 @@ export default class Basic extends MakeCodeMapper {
      * @param value number
      */
     showNumber(value) {
-        this.#simulateLEDs(value)
+        this._simulator.simulateLEDs(value)
     }
 
     /**
@@ -28,7 +29,7 @@ export default class Basic extends MakeCodeMapper {
      * @param leds string
      */
     showLeds(leds) {
-        this.#simulateLEDs(leds)
+        this._simulator.simulateLEDs(leds)
     }
 
     /**
@@ -36,7 +37,7 @@ export default class Basic extends MakeCodeMapper {
      * @param icon IconNames
      */
     showIcon(icon) {
-        this.#simulateLEDs(this.#mapIconNames(icon.split(".")[1]));
+        this._simulator.simulateLEDs(this.#mapIconNames(icon));
     }
 
     /**
@@ -44,7 +45,7 @@ export default class Basic extends MakeCodeMapper {
      * @param text string
      */
     showString(text) {
-        this.#simulateLEDs(text);
+        this._simulator.simulateLEDs(text);
     }
 
     /**
@@ -58,9 +59,8 @@ export default class Basic extends MakeCodeMapper {
      * pausiere (ms)
      * @param ms number
      */
-    async pause(ms) { //TODO ggf. async und await
-        console.log("pause", ms)
-        await this.#simulatePause(ms);
+    async pause(ms) {
+        this._simulator.simulatePause(ms);
     }
 
     /**
@@ -68,16 +68,7 @@ export default class Basic extends MakeCodeMapper {
      * @param direction number
      */
     showArrow(direction) {
-        this.#simulateLEDs(this.#mapArrowName(direction.split(".")[1]));
-    }
-
-    #simulateLEDs(msg) {
-        //TODO log
-        console.log(msg)
-    }
-
-    #simulatePause(ms){
-        return new Promise(resolve => setTimeout(resolve, ms))
+        this._simulator.simulateLEDs(this.#mapArrowName(direction));
     }
 
     /**
@@ -89,63 +80,63 @@ export default class Basic extends MakeCodeMapper {
         switch (iconName) {
             case 0: // "Heart"
             case 1: // "SmallHeart"
-                return "<i class='fas fa-heart'/>";
+                return "<i class='fas fa-heart'></i>";
             case 2: // "Yes"
-                return "<i class='fas fa-check'/>";
+                return "<i class='fas fa-check'></i>";
             case 3: // "No"
-                return "<i class='fas fa-xmark'/>";
+                return "<i class='fas fa-xmark'></i>";
             case 4: // "Happy"
-                return "<i class='fas fa-face-smile'/>";
+                return "<i class='fas fa-face-smile'></i>";
             case 5: // "Sad"
-                return "<i class='fas fa-face-frown'/>";
+                return "<i class='fas fa-face-frown'></i>";
             case 6: // "Confused"
-                return "<i class='fas fa-face-grimace'/>";
+                return "<i class='fas fa-face-grimace'></i>";
             case 7: // "Angry"
-                return "<i class='fas fa-face-angry'/>";
+                return "<i class='fas fa-face-angry'></i>";
             case 8: // "Asleep"
-                return "<i class='fas fa-face-meh-blank'/>";
+                return "<i class='fas fa-face-meh-blank'></i>";
             case 9: // "Surprised"
-                return "<i class='fas fa-face-surprise'/>";
+                return "<i class='fas fa-face-surprise'></i>";
             case 10: // "Silly"
-                return "<i class='fas fa-face-sad-tear'/>";
+                return "<i class='fas fa-face-sad-tear'></i>";
             case 11: // "Fabulous"
-                return "<i class='fas fa-face-grin-stars'/>";
+                return "<i class='fas fa-face-grin-stars'></i>";
             case 12: // "Meh"
-                return "<i class='fas fa-face-meh'/>";
+                return "<i class='fas fa-face-meh'></i>";
             case 13: // "TShirt"
-                return "<i class='fas fa-shirt'/>";
+                return "<i class='fas fa-shirt'></i>";
             case 16: // "House"
-                return "<i class='fas fa-house'/>";
+                return "<i class='fas fa-house'></i>";
             case 19: // "StickFigure":
-                return "<i class='fas fa-child-reaching'/>";
+                return "<i class='fas fa-child-reaching'></i>";
             case 20: // "Ghost"
-                return "<i class='fas fa-ghost'/>";
+                return "<i class='fas fa-ghost'></i>";
             case 23: // "Skull"
-                return "<i class='fas fa-skull'/>";
+                return "<i class='fas fa-skull'></i>";
             case 24: // "Umbrella"
-                return "<i class='fas fa-umbrella'/>";
+                return "<i class='fas fa-umbrella'></i>";
             case 27: // "Cow"
-                return "<i class='fas fa-cow'/>";
+                return "<i class='fas fa-cow'></i>";
             case 28: // "QuarterNote"
             case 29: // "EigthNote"
-                return "<i class='fas fa-music'/>";
+                return "<i class='fas fa-music'></i>";
             case 30: // "Pitchfork"
-                return "<i class='fas fa-y'/>";
+                return "<i class='fas fa-y'></i>";
             case 31: // "Target"
-                return "<i class='fas fa-circle-dot'/>";
+                return "<i class='fas fa-circle-dot'></i>";
             case 32: // "Triangle"
             case 33: // "LeftTriangle"
-                return "<i class='fas fa-caret-left'/>";
+                return "<i class='fas fa-caret-left'></i>";
             case 34: // "Chessboard"
-                return "<i class='fas fa-chess-board'/>";
+                return "<i class='fas fa-chess-board'></i>";
             case 35: // "Diamond"
             case 36: // "SmallDiamond"
-                return "<i class='fas fa-diamond'/>";
+                return "<i class='fas fa-diamond'></i>";
             case 37: // "Square"
             case 38: // "SmallSquare"
-                return "<i class='fas fa-square'/>";
+                return "<i class='fas fa-square'></i>";
             case 39: // "Scissors"
-                return "<i class='fas fa-scissors'/>";
+                return "<i class='fas fa-scissors'></i>";
             default:
                 return "Icon: " + iconName;
         }
@@ -159,19 +150,19 @@ export default class Basic extends MakeCodeMapper {
     #mapArrowName(arrowName) {
         switch (arrowName) {
             case 0: // "North"
-                return "<i class='fas fa-arrow-up'/>";
+                return "<i class='fas fa-arrow-up'></i>";
             case 1: // "NorthEast"
                 return [this.#mapArrowName("North"), this.#mapArrowName("East")].join();
             case 2: // "East"
-                return "<i class='fas fa-arrow-right'/>";
+                return "<i class='fas fa-arrow-right'></i>";
             case 3: // "SouthEast"
                 return [this.#mapArrowName("South"), this.#mapArrowName("East")].join();
             case 4: // "South"
-                return "<i class='fas fa-arrow-down'/>";
+                return "<i class='fas fa-arrow-down'></i>";
             case 5: // "SouthWest"
                 return [this.#mapArrowName("South"), this.#mapArrowName("West")].join();
             case 6: // "West"
-                return "<i class='fas fa-arrow-left'/>";
+                return "<i class='fas fa-arrow-left'></i>";
             case 7: // "NorthWest"
                 return [this.#mapArrowName("North"), this.#mapArrowName("West")].join();
             default:

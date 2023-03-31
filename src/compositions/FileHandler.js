@@ -4,7 +4,7 @@ const MAIN_TS = "main.ts";
 
 /**
  * Liest die hochgeladene Datei ein, um daraus den in MakeCode geschriebenen Code zu extratieren
- * @param file direkt aus dem Input als '.hex'
+ * @param file direkt aus dem InputMapper als '.hex'
  * @returns {Promise<String>} typescript
  */
 export default function readMakeCodeFileAsynchronous(file) {
