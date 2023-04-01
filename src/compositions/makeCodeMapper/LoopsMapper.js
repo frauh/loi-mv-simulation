@@ -7,6 +7,7 @@ export default class LoopsMapper extends Mapper {
 
     /**
      * alle ... ms
+     * Entrypoint vgl. Parser
      * @param intervall Number
      * @param handler function()
      */

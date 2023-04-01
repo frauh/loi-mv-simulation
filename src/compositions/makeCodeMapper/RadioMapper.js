@@ -7,6 +7,7 @@ export default class RadioMapper extends Mapper {
 
     /**
      * wenn Zahl empfangen
+     * Entrypoint vgl. Parser
      * @param handler function(receivedNumber)
      */
     onReceivedNumber(handler) {
@@ -16,6 +17,7 @@ export default class RadioMapper extends Mapper {
 
     /**
      * wenn Text empfangen
+     * Entrypoint vgl. Parser
      * @param handler function(receivedString)
      */
     onReceivedString(handler) {
@@ -25,6 +27,7 @@ export default class RadioMapper extends Mapper {
 
     /**
      * wenn Wertepaar empfangen
+     * Entrypoint vgl. Parser
      * @param handler function(name, value)
      */
     onReceivedValue(handler) {

@@ -30,7 +30,8 @@ import VehicleList from "@/components/VehicleList.vue";
 import LogArea from "@/components/LogArea.vue";
 import Vehicle from "@/compositions/Vehicle";
 import readMakeCodeFileAsynchronous from "@/compositions/FileHandler";
-import Interpreter from "@/compositions/Interpreter";
+import Simulation from "@/compositions/Simulation";
+import parseProgramCode from "@/compositions/Parser";
 
 export default {
     name: "App",
@@ -56,8 +57,8 @@ export default {
         runSimulation() {
             this.isRunning = true
             this.vehicles.forEach(vehicle => {
-                let interpreter = new Interpreter(vehicle, this.$refs.logArea);
-                interpreter.startSimulation();
+                let interpreter = new Simulation(vehicle, this.$refs.logArea);
+                interpreter.start();
                 //TODO webworker bzw. prozesse
             })
         },
@@ -84,7 +85,7 @@ export default {
             this.isRunning = false;
             await readMakeCodeFileAsynchronous(file).then(result => this.vehicles = this.vehicles.map((vehicle) => vehicle.id === id ? {
                 ...vehicle,
-                program: result
+                program: parseProgramCode(result)
             } : vehicle));
         }
     }

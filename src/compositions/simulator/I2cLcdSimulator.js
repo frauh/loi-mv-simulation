@@ -21,7 +21,7 @@ export default class I2cLcdSimulator extends Simulator {
      * @param x Number Spalte auf dem Display (0-15)
      * @param y Number Zeile auf dem Display (0-1)
      */
-    simulateLCD(value, x, y) {
+    simulateLcd(value, x, y) {
         this._display[y] = this.#addToLine(this._display[y], value, x)
         let style = "<p style='font-size:14px; padding-left: 3px; padding-right: 3px;'>";
         let label = "".concat("<b style='color:", this._vehicle.color, "'>", this._vehicle.label, ": </b><br/>");

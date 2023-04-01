@@ -1,5 +1,5 @@
 import Mapper from "@/compositions/makeCodeMapper/Mapper";
-import {Rotation} from "@/compositions/Interpreter";
+import {Rotation} from "@/compositions/Simulation";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Eingabe' für micro:bit V1
@@ -8,6 +8,7 @@ export default class InputMapper extends Mapper {
 
     /**
      * Wenn Knopf geklickt
+     * Entrypoint vgl. Parser
      * @param button Button
      * @param handler function()
      */
@@ -18,6 +19,7 @@ export default class InputMapper extends Mapper {
 
     /**
      * Wenn micro:bit bewegt wird
+     * Entrypoint vgl. Parser
      * @param gesture Gesture
      * @param handler function()
      */
@@ -28,6 +30,7 @@ export default class InputMapper extends Mapper {
 
     /**
      * Wenn Pin gedrückt
+     * Entrypoint vgl. Parser
      * @param name TouchPin
      * @param handler function()
      */
@@ -38,6 +41,7 @@ export default class InputMapper extends Mapper {
 
     /**
      * Wenn Pin losgelassen
+     * Entrypoint vgl. Parser
      * @param name TouchPin
      * @param handler function()
      */
@@ -81,7 +85,7 @@ export default class InputMapper extends Mapper {
      * Kompassausrichtung (°)
      */
     compassHeading() {
-        return this.#simulateRotation();
+        return this._simulator.getRotation();
     }
 
     /**
@@ -105,7 +109,7 @@ export default class InputMapper extends Mapper {
      */
     rotation(kind) {
         if (kind === Rotation.Pitch) {
-            return this.#simulateRotation();
+            return this._simulator.getRotation();
         } else {
             this.notSupported("Eingabe.rotation", "Rotation.Roll");
             return 0;
@@ -124,14 +128,14 @@ export default class InputMapper extends Mapper {
      * Laufzeit (ms)
      */
     runningTime() {
-        return this.#simulateRunningTime();
+        return this._simulator.simulateRunningTime();
     }
 
     /**
      * Laufzeit (micros)
      */
     runningTimeMicros() {
-        return this.#simulateRunningTime() / 1000;
+        return this._simulator.simulateRunningTime() / 1000;
     }
 
     /**
@@ -149,11 +153,4 @@ export default class InputMapper extends Mapper {
         this.notSupported("Eingabe.setzeBewegungsmesser", range);
     }
 
-    #simulateRotation() {
-        return this._simulator.pose.theta * (180/Math.PI) + 90;
-    }
-
-    #simulateRunningTime() {
-        return Date.now() - this._simulator.simulationStartTime;
-    }
 }

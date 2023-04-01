@@ -7,6 +7,7 @@ export default class MusicMapper extends Mapper {
 
     /**
      * Wenn Musik
+     * Entrypoint vgl. Parser
      * @param value MusicEvent
      * @param handler function()
      * @returns {*}

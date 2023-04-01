@@ -21,7 +21,7 @@ export default class I2cLcdMapper extends Mapper {
      * @param y number
      */
     ShowString(s, x, y) {
-        this._simulator.simulateLCD(s, x, y);
+        this._simulator.simulateLcd(s, x, y);
     }
 
     /**
@@ -31,7 +31,7 @@ export default class I2cLcdMapper extends Mapper {
      * @param y number
      */
     ShowNumber(n, x, y) {
-        this._simulator.simulateLCD(n.toString(), x, y);
+        this._simulator.simulateLcd(n.toString(), x, y);
     }
 
     /**

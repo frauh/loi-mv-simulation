@@ -9,6 +9,7 @@ export default class BasicMapper extends Mapper {
 
     /**
      * dauerhaft
+     * Entrypoint vgl. Parser
      * @param handler function()
      */
     forever(handler) {

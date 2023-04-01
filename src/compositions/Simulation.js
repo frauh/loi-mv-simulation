@@ -17,7 +17,7 @@ import LoiMvSimulator from "@/compositions/simulator/LoiMvSimulator";
 import I2cLcdSimulator from "@/compositions/simulator/I2cLcdSimulator";
 import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
 
-export default class Interpreter {
+export default class Simulation {
 
     _vehicle;
     _logArea;
@@ -32,7 +32,7 @@ export default class Interpreter {
      * Initialisiere Simulation und führe anschließend den Code aus.
      * Achtung: Sicherheitsrisiko
      */
-    startSimulation() {
+    start() {
         //TODO while isRunning
         //TODO escape entrypoint oder als event verarbeiten
         //FIXME Aufruf später mit try/catch
