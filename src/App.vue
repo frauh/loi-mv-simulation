@@ -33,7 +33,7 @@ import VehicleList from "@/components/VehicleList.vue";
 import LogArea from "@/components/LogArea.vue";
 import Vehicle from "@/compositions/Vehicle";
 import readMakeCodeFileAsynchronous from "@/compositions/FileHandler";
-import Simulation from "@/compositions/Simulation";
+import Simulation from "@/compositions/simulation/Simulation";
 import parseProgramCode from "@/compositions/Parser";
 
 export default {

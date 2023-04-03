@@ -47,10 +47,6 @@ self.onmessage = async ({
     useVariable(basic, input, music, led, radio, loops, LOI_MV, I2C_LCD1602, neopixel, sonar);
 
     eval(code);
-
-    // self.postMessage({
-    //     answer: code,
-    // });
 };
 
 /**

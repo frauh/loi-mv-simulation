@@ -1,3 +1,5 @@
+import WorkerKey from "@/compositions/simulation/WorkerKey";
+
 export default class Simulation {
     _workers = [];
 
@@ -23,13 +25,13 @@ export default class Simulation {
                 vehicleLabel: vehicle.label,
                 startTime: startTime,
             });
-            worker.onmessage = ({data: {outputLog}}) => {
-                this._logArea.output = this._logArea.output.concat(outputLog);
+            worker.onmessage = ({data: {key, value}}) => {
+                if (key === WorkerKey.outputLog) {
+                    this._logArea.output = this._logArea.output.concat(value);
+                } else {
+                    console.error("Ergebnis kann nicht zugeordnet werden", key);
+                }
             };
-
-            // worker.onmessage = ({data: {answer}}) => {
-            //     console.log(answer);
-            // };
 
             //TODO für Funktionen müsste beim Start auch erfüllt werden, da dort potentielle Variablen definiert sein können
             // ggf. sharedworker, damit dort die variablen vom einen ins andere weitergegeben, wenn sie verändert wurden?
@@ -44,7 +46,7 @@ export default class Simulation {
     }
 
     #createWorker() {
-        const worker = new Worker(new URL("@/compositions/SimulationWorker.js", import.meta.url));
+        const worker = new Worker(new URL("@/compositions/simulation/SimulationWorker.js", import.meta.url));
         this._workers.push(worker);
         return worker;
     }
