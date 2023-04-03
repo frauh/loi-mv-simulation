@@ -2,6 +2,7 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'LCD1602_I2C' für micro:bit V1
+ * vgl. https://github.com/makecode-extensions/i2cLCD1602
  */
 export default class I2cLcdMapper extends Mapper {
 

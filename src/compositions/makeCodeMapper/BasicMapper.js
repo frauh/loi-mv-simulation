@@ -58,10 +58,11 @@ export default class BasicMapper extends Mapper {
 
     /**
      * pausiere (ms)
+     * Dieser Fall wird im Parser abgefangen
      * @param ms number
      */
-    async pause(ms) {
-        this._simulator.simulatePause(ms);
+    pause(ms) {
+        this.notSupported("Grundlagen.pausiere", ms)
     }
 
     /**

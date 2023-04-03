@@ -48,19 +48,16 @@ export default {
             isRunning: false
         }
     },
-    created() {
+    created() {//TODO fort testing
         let vehicle = new Vehicle("red", "test");
-        // vehicle.program = "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nbasic.pause(2000)\nLOI_MV.antrieb(0, 0)\n";
+        vehicle.program.start = "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nbasic.pause(2000)\nLOI_MV.antrieb(0, 0)\n";
         this.vehicles.push(vehicle);
     },
     methods: {
         runSimulation() {
-            this.isRunning = true
-            this.vehicles.forEach(vehicle => {
-                let interpreter = new Simulation(vehicle, this.$refs.logArea);
-                interpreter.start();
-                //TODO webworker bzw. prozesse
-            })
+            this.isRunning = true;
+            let simulation = new Simulation(this.vehicles, this.objects, this.$refs.logArea);
+            simulation.start();
         },
         stopSimulation() {//TODO
             this.isRunning = false;
