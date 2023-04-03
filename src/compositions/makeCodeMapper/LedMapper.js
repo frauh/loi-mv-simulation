@@ -4,7 +4,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * Alle MakeCode Funktionen aus dem Reiter 'LED' für micro:bit V1
  */
 export default class LedMapper extends Mapper {
-
     /**
      * Zeichne
      * @param x number

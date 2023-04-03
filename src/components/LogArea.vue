@@ -11,14 +11,14 @@ export default {
     },
     data() {
         return {
-            output: ""
-        }
-    }, updated() {
+            output: "",
+        };
+    },
+    updated() {
         this.$refs.container.scrollTop = this.$refs.container.scrollHeight;
-    }
+    },
     //TODO log löschen, wenn Simulation (neu) startet, bzw zurückgesetzt wird
-}
-
+};
 </script>
 
 <style scoped>

@@ -1,9 +1,11 @@
 <template>
     <div class="list">
         <div v-for="vehicle in vehicles" :key="vehicle.id">
-            <VehicleItem :vehicle="vehicle"
-                         @deleteVehicle="$emit('deleteVehicle', vehicle.id)"
-                         @toggleTracking="$emit('toggleTracking', vehicle.id)"/>
+            <VehicleItem
+                    :vehicle="vehicle"
+                    @deleteVehicle="$emit('deleteVehicle', vehicle.id)"
+                    @toggleTracking="$emit('toggleTracking', vehicle.id)"
+            />
         </div>
         <AddVehicle/>
     </div>
@@ -18,14 +20,14 @@ export default {
     name: "VehicleList",
     components: {
         AddVehicle,
-        VehicleItem
+        VehicleItem,
     },
     props: {
         title: String,
-        vehicles: Array
+        vehicles: Array,
     },
-    emits: ["addVehicle", "toggleTracking", "deleteVehicle", "programUpload"]
-}
+    emits: ["addVehicle", "toggleTracking", "deleteVehicle", "programUpload"],
+};
 </script>
 
 <style scoped>

@@ -1,8 +1,4 @@
 export default class Simulation {
-
-    _vehicles;
-    _objects;
-    _logArea;
     _workers = [];
 
     constructor(vehicles, objects, logArea) {
@@ -19,14 +15,13 @@ export default class Simulation {
         //FIXME Aufruf später mit try/catch
         let startTime = Date.now();
 
-        this._vehicles.forEach(vehicle => {
-
+        this._vehicles.forEach((vehicle) => {
             const worker = this.#createWorker();
             worker.postMessage({
                 code: vehicle.program.start,
                 vehicleColor: vehicle.color,
                 vehicleLabel: vehicle.label,
-                startTime: startTime
+                startTime: startTime,
             });
             worker.onmessage = ({data: {outputLog}}) => {
                 this._logArea.output = this._logArea.output.concat(outputLog);
@@ -49,9 +44,8 @@ export default class Simulation {
     }
 
     #createWorker() {
-        const worker = new Worker(new URL('@/compositions/SimulationWorker.js', import.meta.url));
+        const worker = new Worker(new URL("@/compositions/SimulationWorker.js", import.meta.url));
         this._workers.push(worker);
         return worker;
     }
-
 }

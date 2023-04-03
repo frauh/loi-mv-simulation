@@ -31,7 +31,9 @@ import SonarSimulator from "@/compositions/simulator/SonarSimulator";
  * @param startTime
  * @return {Promise<void>} outputLog,
  */
-self.onmessage = async ({data: {code, vehicleColor, vehicleLabel, startTime}}) => {
+self.onmessage = async ({
+                            data: {code, vehicleColor, vehicleLabel, startTime},
+                        }) => {
     const basic = new BasicMapper(new BasicSimulator(vehicleColor, vehicleLabel));
     const input = new InputMapper(new InputSimulator(startTime));
     const music = new MusicMapper(new MusicSimulator());
@@ -49,7 +51,6 @@ self.onmessage = async ({data: {code, vehicleColor, vehicleLabel, startTime}}) =
     // self.postMessage({
     //     answer: code,
     // });
-
 };
 
 /**

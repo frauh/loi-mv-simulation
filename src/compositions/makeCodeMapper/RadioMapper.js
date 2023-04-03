@@ -4,7 +4,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * Alle MakeCode Funktionen aus dem Reiter 'Funk' für micro:bit V1
  */
 export default class RadioMapper extends Mapper {
-
     /**
      * wenn Zahl empfangen
      * Entrypoint vgl. Parser
@@ -12,7 +11,7 @@ export default class RadioMapper extends Mapper {
      */
     onReceivedNumber(handler) {
         //TODO entrypoint
-        this.notSupported("Funk.wennZahlEmpfangen", handler)
+        this.notSupported("Funk.wennZahlEmpfangen", handler);
     }
 
     /**
@@ -99,7 +98,6 @@ export default class RadioMapper extends Mapper {
     setFrequencyBand(band) {
         this.notSupported("Funk.setzeFrequenzband", band);
     }
-
 
     /**
      * Ereignis auslösen von Quelle mit Wert

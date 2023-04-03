@@ -1,7 +1,4 @@
-
-
 export default class Mapper {
-
     _simulator;
 
     constructor(simulator) {
@@ -14,7 +11,7 @@ export default class Mapper {
      * @param param Parameter der Funktion
      */
     notSupported(name, ...param) {
-        console.warn("Die Funktion ".concat(name,  "(", param.toString(), ") wird in der Simulation nicht unterstützt."));
+        console.warn("Die Funktion ".concat(name, "(", param.toString(), ") wird in der Simulation nicht unterstützt."));
     }
 
     /**
@@ -23,7 +20,6 @@ export default class Mapper {
      * @param param
      */
     unused(name, ...param) {
-        console.warn("Parameter für ".concat(name, "(", param.toString(),") werden nicht beachtet."));
+        console.warn("Parameter für ".concat(name, "(", param.toString(), ") werden nicht beachtet."));
     }
-
 }

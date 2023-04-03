@@ -5,7 +5,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * vgl. https://github.com/microsoft/pxt-neopixel/blob/master/neopixel.ts
  */
 export default class NeopixelMapper extends Mapper {
-
     /**
      * setze Strip auf
      * @param pin DigitalPin
@@ -44,11 +43,9 @@ export default class NeopixelMapper extends Mapper {
     rgb(red, green, blue) {
         this.notSupported("NeopixelMapper.rgb", red, green, blue);
     }
-
 }
 
 class Strip extends Mapper {
-
     constructor() {
         super();
     }
@@ -77,7 +74,7 @@ class Strip extends Mapper {
      */
     showColor(rgb) {
         // TODO
-        console.log("show Color", rgb)
+        console.log("show Color", rgb);
     }
 
     /**

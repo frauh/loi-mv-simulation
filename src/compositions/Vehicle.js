@@ -1,5 +1,4 @@
 export default class Vehicle {
-
     #standardOrientations = [0, 45, 90, 135, 180, 225, 270, 315];
     id = 0;
     color = "";
@@ -16,8 +15,7 @@ export default class Vehicle {
         this.pose = this.previousStartPose = {
             x: Math.floor(Math.random() * 79),
             y: Math.floor(Math.random() * 80),
-            theta: this.#standardOrientations[Math.floor(Math.random() * this.#standardOrientations.length)]
+            theta: this.#standardOrientations[Math.floor(Math.random() * this.#standardOrientations.length)],
         };
     }
-
 }

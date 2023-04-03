@@ -1,25 +1,45 @@
 <template>
     <div class="row">
-        <button class="modal-button" type="button" @click="showModal=true"><i class="fas fa-plus"></i></button>
+        <button class="modal-button" type="button" @click="showModal = true">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
-    <VueModal v-model="showModal" title="Neues Fahrzeug" @after-close="afterClose">
+    <VueModal
+            v-model="showModal"
+            title="Neues Fahrzeug"
+            @after-close="afterClose"
+    >
         <form>
             <div class="modal-row">
                 <label for="name">Bezeichnung:</label>
-                <input id="name" v-model="label" placeholder="Wie heißt dein Roboter?" type="text">
+                <input
+                        id="name"
+                        v-model="label"
+                        placeholder="Wie heißt dein Roboter?"
+                        type="text"
+                />
             </div>
             <div class="modal-row">
                 <label for="color">Farbe:</label>
-                <div v-for="(color, index) in colors" id="color" :key="index" class="img-container">
-                    <img :alt="`${color}`"
-                         :class="color === this.color ? 'img-selected' : 'img-not-selected'"
-                         :src="require('@/assets/side-'+`${color}`+'.png')"
-                         @click="chooseColor(color)">
+                <div
+                        v-for="(color, index) in colors"
+                        id="color"
+                        :key="index"
+                        class="img-container"
+                >
+                    <img
+                            :alt="`${color}`"
+                            :class="color === this.color ? 'img-selected' : 'img-not-selected'"
+                            :src="require('@/assets/side-' + `${color}` + '.png')"
+                            @click="chooseColor(color)"
+                    />
                 </div>
             </div>
-            <button :disabled="!this.label || !this.color"
+            <button
+                    :disabled="!this.label || !this.color"
                     class="submit-button"
-                    @click="onSubmit">
+                    @click="onSubmit"
+            >
                 OK
             </button>
         </form>
@@ -27,13 +47,13 @@
 </template>
 
 <script>
-import VueModal from '@kouts/vue-modal'
+import VueModal from "@kouts/vue-modal";
 import Vehicle from "@/compositions/Vehicle";
 
 export default {
     name: "AddVehicle",
     components: {
-        VueModal
+        VueModal,
     },
     data() {
         return {
@@ -41,30 +61,37 @@ export default {
             colors: new Set(),
             label: "",
             color: "",
-            isValid: false
-        }
+            isValid: false,
+        };
     },
     created() {
-        require.context("@/assets/", true, /^.*\.png$/).keys().forEach(name => {
-            this.colors.add(name.toString().match(/[^-]\w+(?=.png)/).toString())
-        })
+        require
+            .context("@/assets/", true, /^.*\.png$/)
+            .keys()
+            .forEach((name) => {
+                this.colors.add(
+                    name
+                        .toString()
+                        .match(/[^-]\w+(?=.png)/)
+                        .toString()
+                );
+            });
     },
     methods: {
         chooseColor(color) {
-            this.color = color
+            this.color = color;
         },
         onSubmit(e) {
-            e.preventDefault()
-            this.$parent.$emit("addVehicle", new Vehicle(this.color, this.label))
-            this.showModal = false
+            e.preventDefault();
+            this.$parent.$emit("addVehicle", new Vehicle(this.color, this.label));
+            this.showModal = false;
         },
         afterClose() {
-            this.color = ""
-            this.label = ""
-        }
+            this.color = "";
+            this.label = "";
+        },
     },
-}
-
+};
 </script>
 
 <style scoped>
@@ -108,7 +135,8 @@ export default {
     cursor: pointer;
 }
 
-.img-selected, .img-not-selected:hover {
+.img-selected,
+.img-not-selected:hover {
     opacity: 1;
 }
 

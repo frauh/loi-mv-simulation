@@ -5,7 +5,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * vgl. https://github.com/makecode-extensions/i2cLCD1602
  */
 export default class I2cLcdMapper extends Mapper {
-
     /**
      * LCD initialize with Address
      * @param addr number
@@ -74,15 +73,13 @@ export default class I2cLcdMapper extends Mapper {
      * shift left
      */
     shl() {
-        this.notSupported("LCD1602_I2C.shiftLeft")
+        this.notSupported("LCD1602_I2C.shiftLeft");
     }
 
     /**
      * shift right
      */
     shr() {
-        this.notSupported("LCD1602_I2C.shiftRight")
+        this.notSupported("LCD1602_I2C.shiftRight");
     }
-
-
 }

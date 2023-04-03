@@ -1,9 +1,11 @@
 <template>
-    <ControlButton :class="isEnabled ? 'enabled' : 'disable'"
-                   :color="isEnabled ? 'steelblue' : 'lightsteelblue'"
-                   :description="isEnabled ? descriptionEnabled : descriptionDisabled"
-                   :icon="icon"
-                   @btn-click="$emit('toggle')"/>
+    <ControlButton
+            :class="isEnabled ? 'enabled' : 'disable'"
+            :color="isEnabled ? 'steelblue' : 'lightsteelblue'"
+            :description="isEnabled ? descriptionEnabled : descriptionDisabled"
+            :icon="icon"
+            @btn-click="$emit('toggle')"
+    />
 </template>
 
 <script>
@@ -12,15 +14,15 @@ import ControlButton from "@/components/ControlButton.vue";
 export default {
     name: "ToggleButton",
     components: {
-        ControlButton
+        ControlButton,
     },
     props: {
         icon: String,
         descriptionEnabled: String,
         descriptionDisabled: String,
-        isEnabled: Boolean
-    }
-}
+        isEnabled: Boolean,
+    },
+};
 </script>
 
 <style scoped>

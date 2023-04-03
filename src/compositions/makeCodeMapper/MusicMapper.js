@@ -4,7 +4,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * Alle MakeCode Funktionen aus dem Reiter 'Musik' für micro:bit V1
  */
 export default class MusicMapper extends Mapper {
-
     /**
      * Wenn Musik
      * Entrypoint vgl. Parser
@@ -111,7 +110,7 @@ export default class MusicMapper extends Mapper {
      * @param options MelodyStopOptions
      */
     stopMelody(options) {
-        this.notSupported("Musik.halteMelodieAn", options)
+        this.notSupported("Musik.halteMelodieAn", options);
     }
 
     /**

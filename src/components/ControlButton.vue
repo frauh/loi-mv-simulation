@@ -1,8 +1,10 @@
 <template>
-    <button :style="{color: color}"
+    <button
+            :style="{ color: color }"
             :title="description"
             class="btn"
-            @click="onClick()">
+            @click="onClick()"
+    >
         <i :class="icon"></i>
     </button>
 </template>
@@ -13,14 +15,14 @@ export default {
     props: {
         description: String,
         icon: String,
-        color: String
+        color: String,
     },
     methods: {
         onClick() {
-            this.$emit('btn-click')
-        }
-    }
-}
+            this.$emit("btn-click");
+        },
+    },
+};
 </script>
 
 <style scoped>

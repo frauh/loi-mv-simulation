@@ -3,40 +3,57 @@
         <label class="label" for="row">{{ vehicle.label }}</label>
         <div id="row" class="row">
             <div class="img-container">
-                <img :alt="`${vehicle.color}`" :src="require(`@/assets/side-${vehicle.color}.png`)">
+                <img
+                        :alt="`${vehicle.color}`"
+                        :src="require(`@/assets/side-${vehicle.color}.png`)"
+                />
             </div>
             <div class="button-group">
                 <!-- TODO file upload -->
                 <!-- TODO dropZone  -->
                 <!-- TODO Hochgladene Datei (Name?) anzeigen -->
-                <input id="fileInput"
-                       ref="fileInput"
-                       accept=".hex"
-                       hidden
-                       type="file"
-                       @input="handleFileUpload">
-                <ControlButton color="orange"
-                               description="Programm hochladen"
-                               icon="fas fa-file-arrow-up"
-                               @btn-click="selectFile"/>
-                <ToggleButton :is-enabled="vehicle.isTracked"
-                              description-disabled="Fahrstrecke anzeigen"
-                              description-enabled="Fahrstrecke ausblenden"
-                              icon="fas fa-shuffle"
-                              @toggle="$emit('toggleTracking')"/>
-                <ControlButton color="red"
-                               description="Fahrzeug löschen"
-                               icon="fas fa-trash-can"
-                               @btn-click="showDeleteModal=true"/>
+                <input
+                        id="fileInput"
+                        ref="fileInput"
+                        accept=".hex"
+                        hidden
+                        type="file"
+                        @input="handleFileUpload"
+                />
+                <ControlButton
+                        color="orange"
+                        description="Programm hochladen"
+                        icon="fas fa-file-arrow-up"
+                        @btn-click="selectFile"
+                />
+                <ToggleButton
+                        :is-enabled="vehicle.isTracked"
+                        description-disabled="Fahrstrecke anzeigen"
+                        description-enabled="Fahrstrecke ausblenden"
+                        icon="fas fa-shuffle"
+                        @toggle="$emit('toggleTracking')"
+                />
+                <ControlButton
+                        color="red"
+                        description="Fahrzeug löschen"
+                        icon="fas fa-trash-can"
+                        @btn-click="showDeleteModal = true"
+                />
             </div>
         </div>
     </div>
     <VueModal v-model="showDeleteModal" title="Bitte bestätigen">
         <div>
-            <label>Möchtest du das Fahrzeug "{{ vehicle.label }}" wirklich löschen?</label>
+            <label
+            >Möchtest du das Fahrzeug "{{ vehicle.label }}" wirklich löschen?</label
+            >
             <div class="modal-button-group">
-                <button class="submit-button" @click="$emit('deleteVehicle')">Ja, löschen</button>
-                <button class="close-button" @click="showDeleteModal=false">Nein</button>
+                <button class="submit-button" @click="$emit('deleteVehicle')">
+                    Ja, löschen
+                </button>
+                <button class="close-button" @click="showDeleteModal = false">
+                    Nein
+                </button>
             </div>
         </div>
     </VueModal>
@@ -45,22 +62,22 @@
 <script>
 import ControlButton from "@/components/ControlButton.vue";
 import ToggleButton from "@/components/ToggleButton.vue";
-import VueModal from '@kouts/vue-modal'
+import VueModal from "@kouts/vue-modal";
 
 export default {
     name: "VehicleItem",
     components: {
         ControlButton,
         ToggleButton,
-        VueModal
+        VueModal,
     },
     data() {
         return {
             showDeleteModal: false,
-        }
+        };
     },
     props: {
-        vehicle: Object
+        vehicle: Object,
     },
     emits: ["toggleTracking", "deleteVehicle", "programUpload"],
     methods: {
@@ -68,11 +85,15 @@ export default {
             this.$refs.fileInput.click();
         },
         handleFileUpload() {
-            this.$parent.$emit("programUpload", this.vehicle.id, this.$refs.fileInput.files[0]);
+            this.$parent.$emit(
+                "programUpload",
+                this.vehicle.id,
+                this.$refs.fileInput.files[0]
+            );
             this.$refs.fileInput.value = "";
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <style scoped>
@@ -158,6 +179,5 @@ export default {
 .close-button {
     margin-right: 0;
     background: steelblue;
-
 }
 </style>

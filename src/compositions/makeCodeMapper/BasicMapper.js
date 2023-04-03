@@ -5,8 +5,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * 'Beim Start' wird nicht beachtet, da dieses im Javascript an erster Stelle steht
  */
 export default class BasicMapper extends Mapper {
-
-
     /**
      * dauerhaft
      * Entrypoint vgl. Parser
@@ -14,7 +12,7 @@ export default class BasicMapper extends Mapper {
      */
     forever(handler) {
         //TODO entrypoint
-        this.notSupported("Grundlagen.dauerhaft", handler)
+        this.notSupported("Grundlagen.dauerhaft", handler);
     }
 
     /**
@@ -22,7 +20,7 @@ export default class BasicMapper extends Mapper {
      * @param value number
      */
     showNumber(value) {
-        this._simulator.simulateLEDs(value)
+        this._simulator.simulateLEDs(value);
     }
 
     /**
@@ -30,7 +28,7 @@ export default class BasicMapper extends Mapper {
      * @param leds string
      */
     showLeds(leds) {
-        this._simulator.simulateLEDs(leds)
+        this._simulator.simulateLEDs(leds);
     }
 
     /**
@@ -62,7 +60,7 @@ export default class BasicMapper extends Mapper {
      * @param ms number
      */
     pause(ms) {
-        this.notSupported("Grundlagen.pausiere", ms)
+        this.notSupported("Grundlagen.pausiere", ms);
     }
 
     /**

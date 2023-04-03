@@ -4,7 +4,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * Alle MakeCode Funktionen aus dem Reiter 'LOI_MV' für micro:bit V1
  */
 export default class LoiMvMapper extends Mapper {
-
     /**
      *
      * @param kompass Boolean
@@ -20,7 +19,7 @@ export default class LoiMvMapper extends Mapper {
      * @param tolleranz Number
      */
     graddrehung(drehung, tolleranz) {
-        console.log(drehung, tolleranz)
+        console.log(drehung, tolleranz);
     }
 
     helligkeitLinks() {
@@ -35,10 +34,9 @@ export default class LoiMvMapper extends Mapper {
      * @param lenkung Number
      */
     antrieb(power, lenkung) {
-        console.log("antrieb", power, lenkung)
+        console.log("antrieb", power, lenkung);
     }
 
     ultraschall() {
     }
-
 }

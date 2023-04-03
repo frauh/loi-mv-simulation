@@ -5,7 +5,6 @@ import {Rotation} from "@/compositions/Simulation";
  * Alle MakeCode Funktionen aus dem Reiter 'Eingabe' für micro:bit V1
  */
 export default class InputMapper extends Mapper {
-
     /**
      * Wenn Knopf geklickt
      * Entrypoint vgl. Parser
@@ -14,7 +13,7 @@ export default class InputMapper extends Mapper {
      */
     onButtonPressed(button, handler) {
         //TODO entrypoint
-        this.notSupported("Eingabe.wennKnopfGeklickt", button, handler)
+        this.notSupported("Eingabe.wennKnopfGeklickt", button, handler);
     }
 
     /**
@@ -25,7 +24,7 @@ export default class InputMapper extends Mapper {
      */
     onGesture(gesture, handler) {
         //TODO entrypoint
-        this.notSupported("Eingabe.wennBewegt", gesture, handler)
+        this.notSupported("Eingabe.wennBewegt", gesture, handler);
     }
 
     /**
@@ -55,7 +54,7 @@ export default class InputMapper extends Mapper {
      * @param button Button
      */
     buttonIsPressed(button) {
-        this.notSupported("Eingabe.knopfIstGeklickt", button)
+        this.notSupported("Eingabe.knopfIstGeklickt", button);
     }
 
     /**
@@ -63,7 +62,7 @@ export default class InputMapper extends Mapper {
      * @param dimension Dimension
      */
     acceleration(dimension) {
-        this.notSupported("Eingabe.beschleunigung", dimension)
+        this.notSupported("Eingabe.beschleunigung", dimension);
     }
 
     /**
@@ -71,14 +70,14 @@ export default class InputMapper extends Mapper {
      * @param name TouchPin
      */
     pinIsPressed(name) {
-        this.notSupported("Eingabe.pinIstGedrückt", name)
+        this.notSupported("Eingabe.pinIstGedrückt", name);
     }
 
     /**
      * Lichtstärke
      */
     lightLevel() {
-        this.notSupported("Eingabe.lichtstärke")
+        this.notSupported("Eingabe.lichtstärke");
     }
 
     /**
@@ -92,7 +91,7 @@ export default class InputMapper extends Mapper {
      * Temperatur (C°)
      */
     temperature() {
-        this.notSupported("Eingabe.temperatur")
+        this.notSupported("Eingabe.temperatur");
     }
 
     /**
@@ -152,5 +151,4 @@ export default class InputMapper extends Mapper {
     setAccelerometerRange(range) {
         this.notSupported("Eingabe.setzeBewegungsmesser", range);
     }
-
 }

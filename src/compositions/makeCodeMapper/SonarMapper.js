@@ -5,7 +5,6 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * vgl. https://github.com/microsoft/pxt-sonar
  */
 export default class SonarMapper extends Mapper {
-
     /**
      * ping
      * @param trig DigitalPin
@@ -13,6 +12,6 @@ export default class SonarMapper extends Mapper {
      * @param unit PingUnit
      */
     ping(trig, echo, unit) {
-        this.notSupported("Sonar.ping", trig, echo, unit)
+        this.notSupported("Sonar.ping", trig, echo, unit);
     }
 }
