@@ -13,8 +13,8 @@ export default class Vehicle {
         this.color = color;
         this.label = label;
         this.pose = this.previousStartPose = {
-            x: Math.floor(Math.random() * 79),
-            y: Math.floor(Math.random() * 80),
+            x: Math.floor(250 + Math.random() * 550),
+            y: Math.floor(150 + Math.random() * 400),
             theta: this.#standardOrientations[Math.floor(Math.random() * this.#standardOrientations.length)],
         };
     }

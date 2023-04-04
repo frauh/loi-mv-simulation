@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+// noinspection JSUnusedGlobalSymbols
+
 import BasicMapper from "@/compositions/makeCodeMapper/BasicMapper";
 import BasicSimulator from "@/compositions/simulator/BasicSimulator";
 import InputMapper from "@/compositions/makeCodeMapper/InputMapper";
@@ -44,17 +47,9 @@ self.onmessage = async ({
     const I2C_LCD1602 = new I2cLcdMapper(new I2cLcdSimulator(vehicleColor, vehicleLabel));
     const neopixel = new NeopixelMapper(new NeopixelSimulator());
     const sonar = new SonarMapper(new SonarSimulator());
-    useVariable(basic, input, music, led, radio, loops, LOI_MV, I2C_LCD1602, neopixel, sonar);
 
     eval(code);
 };
-
-/**
- * Damit die Mapper nicht als "unused variables" gelten und der Code kompiliert
- */
-function useVariable(...args) {
-    return args;
-}
 
 /**
  * Die benötigten Enums, damit alles definiert ist, was im auszuführenden Code referenziert werden kann.

@@ -29,7 +29,7 @@ export default class Simulation {
                 if (key === WorkerKey.outputLog) {
                     this._logArea.output = this._logArea.output.concat(value);
                 } else {
-                    console.error("Ergebnis kann nicht zugeordnet werden", key);
+                    console.error("Ergebnis des Workers kann nicht zugeordnet werden:", key);
                 }
             };
 

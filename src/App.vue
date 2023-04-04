@@ -23,7 +23,6 @@
             <LogArea ref="logArea" title="Log"/>
         </div>
     </div>
-  <!-- https://www.youtube.com/watch?v=qZXt1Aom3Cs -->
 </template>
 
 <script>
@@ -49,33 +48,40 @@ export default {
             vehicles: [],
             objects: [],
             isRunning: false,
+            simulation: undefined,
         };
     },
     created() {
         //TODO fort testing
         let vehicle = new Vehicle("red", "test");
         vehicle.program.start =
-            "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nbasic.pause(2000)\nLOI_MV.antrieb(0, 0)\n";
+            "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nsetTimeout(() =>{\nLOI_MV.antrieb(0, 0)\n},2000)";
         this.vehicles.push(vehicle);
     },
     methods: {
         runSimulation() {
+            // TODO erst die Untergrund des Canvas nehmen?
             this.isRunning = true;
             let simulation = new Simulation(
                 this.vehicles,
                 this.objects,
                 this.$refs.logArea
             );
+            this.simulation = simulation;
             simulation.start();
         },
         stopSimulation() {
-            //TODO
+            if (this.simulation) {
+                this.simulation.stop();
+            }
             this.isRunning = false;
         },
         resetSimulation() {
-            //TODO
-            this.isRunning = false;
+            this.stopSimulation();
             this.$refs.logArea.$data.output = "";
+            this.vehicles.forEach((vehicle) => {
+                vehicle.pose = vehicle.previousStartPose;
+            });
         },
         addVehicle(vehicle) {
             this.vehicles = [...this.vehicles, vehicle];

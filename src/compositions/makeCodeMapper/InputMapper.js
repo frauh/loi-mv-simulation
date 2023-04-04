@@ -1,5 +1,5 @@
 import Mapper from "@/compositions/makeCodeMapper/Mapper";
-import {Rotation} from "@/compositions/simulation/Simulation";
+import {Rotation} from "@/compositions/simulation/SimulationWorker";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Eingabe' für micro:bit V1
