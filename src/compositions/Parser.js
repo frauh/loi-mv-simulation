@@ -1,13 +1,21 @@
+/**
+ * Führt auf dem eingelesenen Javascriptcode Operationen durch.
+ * Trennt unterschiedliche Codeblöcke voneinander und sucht nach besonderen Befehlen, die ersetzt werden müssen.
+ * Fügt am Ende des Codes das Senden einer Nachricht ein, die der ausführende SimulationWorker.js an die Simulation.js sendet.
+ * @param code
+ * @return {{functions: string[], start: string}}
+ */
 export default function parseProgramCode(code) {
     let program = separateStartFrom(code);
-    program = doReplacements(program, searchAndReplacePause);
-    return program;
-}
-
-function doReplacements(program, handler) {
-    program.start = handler(program.start);
-    for (let functionsKey in program.functions) {
-        program.functions[functionsKey] = handler(program.functions[functionsKey]);
+    if (program.start) {
+        program.start = searchAndReplacePause(program.start.concat("self.postMessage({key: 'evalFinished', value: true})\n"));
+    }
+    for (let functionKey in program.functions) {
+        let commands = program.functions[functionKey];
+        commands = commands
+            .slice(0, commands.lastIndexOf("})"))
+            .concat("self.postMessage({key: 'evalFinished', value: true})\n", commands.slice(commands.lastIndexOf("})")));
+        program.functions[functionKey] = searchAndReplacePause(commands);
     }
     return program;
 }
@@ -19,17 +27,10 @@ function doReplacements(program, handler) {
  */
 function separateStartFrom(code) {
     let program = {start: "", functions: []};
-    let split = code.split("})\n");
-    if (!split[split.length - 1]) {
+    let split = code.concat("\n").split("})\n");
+    console.log(split[split.length - 1].trim())
+    if (!split[split.length - 1] || !split[split.length - 1].trim()) {
         split.pop();
-    }
-    if (split.length === 1) {
-        if (!startsAsFunction(code)) {
-            program.start = code;
-        } else {
-            program.functions.push(code);
-        }
-        return program;
     }
     split.forEach((line) => {
         if (!startsAsFunction(line)) {

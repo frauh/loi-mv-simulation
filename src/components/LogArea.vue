@@ -17,7 +17,6 @@ export default {
     updated() {
         this.$refs.container.scrollTop = this.$refs.container.scrollHeight;
     },
-    //TODO log löschen, wenn Simulation (neu) startet, bzw zurückgesetzt wird
 };
 </script>
 

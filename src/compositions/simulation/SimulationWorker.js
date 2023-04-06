@@ -21,6 +21,7 @@ import NeopixelMapper from "@/compositions/makeCodeMapper/NeopixelMapper";
 import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
 import SonarMapper from "@/compositions/makeCodeMapper/SonarMapper";
 import SonarSimulator from "@/compositions/simulator/SonarSimulator";
+import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 
 /**
  *
@@ -32,19 +33,22 @@ import SonarSimulator from "@/compositions/simulator/SonarSimulator";
  * @param vehicleColor
  * @param vehicleLabel
  * @param startTime
+ * @param pose
  * @return {Promise<void>} outputLog,
  */
 self.onmessage = async ({
-                            data: {code, vehicleColor, vehicleLabel, startTime},
+                            data: {code, vehicleColor, vehicleLabel, startTime, pose},
                         }) => {
     const basic = new BasicMapper(new BasicSimulator(vehicleColor, vehicleLabel));
-    const input = new InputMapper(new InputSimulator(startTime));
+    const input = new InputMapper(new InputSimulator(startTime, pose));
     const music = new MusicMapper(new MusicSimulator());
     const led = new LedMapper(new LedSimulator());
     const radio = new RadioMapper(new RadioSimulator());
     const loops = new LoopsMapper(new LoopsSimulator());
-    const LOI_MV = new LoiMvMapper(new LoiMvSimulator());
-    const I2C_LCD1602 = new I2cLcdMapper(new I2cLcdSimulator(vehicleColor, vehicleLabel));
+    const LOI_MV = new LoiMvMapper(new LoiMvSimulator(pose));
+    const I2C_LCD1602 = new I2cLcdMapper(
+        new I2cLcdSimulator(vehicleColor, vehicleLabel)
+    );
     const neopixel = new NeopixelMapper(new NeopixelSimulator());
     const sonar = new SonarMapper(new SonarSimulator());
 
@@ -147,7 +151,14 @@ export const IconNames = {
 };
 
 export const ArrowNames = {
-    North: 0, NorthEast: 1, East: 2, SouthEast: 3, South: 4, SouthWest: 5, West: 6, NorthWest: 7,
+    North: 0,
+    NorthEast: 1,
+    East: 2,
+    SouthEast: 3,
+    South: 4,
+    SouthWest: 5,
+    West: 6,
+    NorthWest: 7,
 };
 
 /*
@@ -155,7 +166,9 @@ InputMapper
  */
 
 export const Button = {
-    A: 1, B: 2, AB: 3,
+    A: 1,
+    B: 2,
+    AB: 3,
 };
 
 export const Gesture = {
@@ -173,19 +186,28 @@ export const Gesture = {
 };
 
 export const TouchPin = {
-    P0: 100, P1: 101, P2: 102,
+    P0: 100,
+    P1: 101,
+    P2: 102,
 };
 
 export const Dimension = {
-    X: 0, Y: 1, Z: 2, Strength: 3,
+    X: 0,
+    Y: 1,
+    Z: 2,
+    Strength: 3,
 };
 
 export const Rotation = {
-    Pitch: 0, Roll: 1,
+    Pitch: 0,
+    Roll: 1,
 };
 
 export const AcceleratorRange = {
-    OneG: 1, TwoG: 2, FourG: 4, EightG: 8,
+    OneG: 1,
+    TwoG: 2,
+    FourG: 4,
+    EightG: 8,
 };
 
 /*
@@ -206,7 +228,13 @@ export const MusicEvent = {
 };
 
 export const BeatFraction = {
-    Whole: 1, Half: 2, Quarter: 4, Eighth: 8, Sixteenth: 16, Double: 32, Breve: 64,
+    Whole: 1,
+    Half: 2,
+    Quarter: 4,
+    Eighth: 8,
+    Sixteenth: 16,
+    Double: 32,
+    Breve: 64,
 };
 
 export const Melodies = {
@@ -233,11 +261,16 @@ export const Melodies = {
 };
 
 export const MelodyOptions = {
-    Once: 1, Forever: 2, OnceInBackground: 4, ForeverInBackground: 8,
+    Once: 1,
+    Forever: 2,
+    OnceInBackground: 4,
+    ForeverInBackground: 8,
 };
 
 export const MelodyStopOptions = {
-    All: 1 | 4, Foreground: 1, Background: 4,
+    All: 1 | 4,
+    Foreground: 1,
+    Background: 4,
 };
 
 /*
@@ -245,7 +278,8 @@ LED
  */
 
 export const DisplayMode = {
-    BlackAndWhite: 0, Greyscale: 1,
+    BlackAndWhite: 0,
+    Greyscale: 1,
 };
 
 /*
@@ -253,7 +287,9 @@ RadioMapper
  */
 
 export const RadioPacketProperty = {
-    SignalStrength: 2, Time: 0, SerialNumber: 1,
+    SignalStrength: 2,
+    Time: 0,
+    SerialNumber: 1,
 };
 
 export const EventBusSource = {
@@ -370,7 +406,9 @@ export const NeoPixelColors = {
 };
 
 export const NeoPixelMode = {
-    RGB: 1, RGBW: 2, RGB_RGB: 3,
+    RGB: 1,
+    RGBW: 2,
+    RGB_RGB: 3,
 };
 
 /*
@@ -378,5 +416,7 @@ SonarMapper
  */
 
 export const PingUnit = {
-    MicroSeconds: "microseconds", Centimeters: "centimeters", Inches: "inches",
+    MicroSeconds: "microseconds",
+    Centimeters: "centimeters",
+    Inches: "inches",
 };

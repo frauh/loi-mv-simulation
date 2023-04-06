@@ -1,18 +1,17 @@
 import Simulator from "@/compositions/simulator/Simulator";
 
 export default class InputSimulator extends Simulator {
-    constructor(startTime) {
+    constructor(startTime, pose) {
         super();
         this._startTime = startTime;
+        this._pose = pose;
     }
 
     getRotation() {
-        //FIXME
-        return this._vehicle.pose.theta * (180 / Math.PI) + 90;
+        return this.pose.theta + 90;
     }
 
     simulateRunningTime() {
-        //FIXME
         return Date.now() - this._startTime;
     }
 }

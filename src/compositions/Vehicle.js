@@ -5,7 +5,7 @@ export default class Vehicle {
     label = "";
     isTracked = false;
     program = {start: "", functions: []};
-    pose = {x: 0, y: 0, theta: 0};
+    pose = {x: 0.0, y: 0.0, theta: 0.0};
     previousStartPose = {x: 0, y: 0, theta: 0};
 
     constructor(color, label) {
@@ -13,8 +13,8 @@ export default class Vehicle {
         this.color = color;
         this.label = label;
         this.pose = this.previousStartPose = {
-            x: Math.floor(250 + Math.random() * 550),
-            y: Math.floor(150 + Math.random() * 400),
+            x: 0.3 + Math.random() * 0.75,
+            y: 0.15 + Math.random() * 0.6,
             theta: this.#standardOrientations[Math.floor(Math.random() * this.#standardOrientations.length)],
         };
     }

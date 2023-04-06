@@ -1,11 +1,15 @@
 <template>
     <div class="row">
         <div class="col-left">
-            <SimulationArea :vehicles="vehicles" title="Simulation"/>
+            <SimulationArea
+                    :vehicles="vehicles"
+                    title="Simulation"
+                    @stopSimulation="stopSimulation"
+            />
         </div>
         <div class="col-middle">
             <ButtonBar
-                    :is-running="isRunning"
+                    :is-running="simulation.isRunning"
                     @resetSimulation="resetSimulation"
                     @runSimulation="runSimulation"
                     @stopSimulation="stopSimulation"
@@ -47,34 +51,30 @@ export default {
         return {
             vehicles: [],
             objects: [],
-            isRunning: false,
-            simulation: undefined,
+            simulation: new Simulation(this.$refs.logArea),
         };
     },
     created() {
-        //TODO fort testing
+        //TODO for testing
         let vehicle = new Vehicle("red", "test");
-        vehicle.program.start =
-            "LOI_MV.init(false)\nlet strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\nstrip.showColor(neopixel.colors(NeoPixelColors.Purple))\nLOI_MV.antrieb(10, 0)\nsetTimeout(() =>{\nLOI_MV.antrieb(0, 0)\n},2000)";
+        vehicle.program = parseProgramCode(
+            "basic.forever(function () {\n" +
+            "    LOI_MV.antrieb(10, 0)\n" +
+            "    basic.pause(100)\n" +
+            "    LOI_MV.antrieb(0, 0)\n" +
+            "})\n"
+        );
         this.vehicles.push(vehicle);
     },
     methods: {
         runSimulation() {
-            // TODO erst die Untergrund des Canvas nehmen?
-            this.isRunning = true;
-            let simulation = new Simulation(
-                this.vehicles,
-                this.objects,
-                this.$refs.logArea
-            );
-            this.simulation = simulation;
-            simulation.start();
+            // TODO erst den Untergrund des Canvas nehmen?
+            this.simulation.vehicles = this.vehicles;
+            this.simulation.start();
         },
+
         stopSimulation() {
-            if (this.simulation) {
-                this.simulation.stop();
-            }
-            this.isRunning = false;
+            this.simulation.stop();
         },
         resetSimulation() {
             this.stopSimulation();
@@ -100,7 +100,7 @@ export default {
             );
         },
         async programUpload(id, file) {
-            this.isRunning = false;
+            // this.stopSimulation();
             await readMakeCodeFileAsynchronous(file).then(
                 (result) =>
                     (this.vehicles = this.vehicles.map((vehicle) =>

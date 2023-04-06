@@ -82,6 +82,7 @@ export default {
     emits: ["toggleTracking", "deleteVehicle", "programUpload"],
     methods: {
         selectFile() {
+            this.$parent.$emit("stopSimulation")
             this.$refs.fileInput.click();
         },
         handleFileUpload() {

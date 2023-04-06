@@ -1,6 +1,6 @@
 <template>
-    <div id="container" ref="container" class="container">
-        <!--        <canvas ref="simulationArea"></canvas>-->
+    <div class="area">
+        <div id="container" ref="container" class="container"></div>
         <h3 class="heading-left">{{ title }}</h3>
     </div>
 </template>
@@ -16,6 +16,11 @@ export default {
     props: {
         title: String,
         vehicles: Array,
+    },
+    data() {
+        return{
+            layer: null
+        }
     },
     mounted() {
         let stage = new Konva.Stage({
@@ -39,13 +44,15 @@ export default {
                 image.onload = () => {
                     let robot = new Konva.Image({
                         image: image,
-                        x: vehicle.pose.x,
-                        y: vehicle.pose.y, //TODO y umrechnen
+                        x: this.convertToPixels(vehicle.pose.x),
+                        y: this.convertToPixels(vehicle.pose.y), //TODO y umrechnen
                         rotation: vehicle.pose.theta,
                         // Verhältnis Roboter zu DIN-A0
                         width: layer.canvas.width * 0.206,
                         height: layer.canvas.height * 0.1938,
-                        draggable: true,
+                        offsetX: layer.canvas.width * 0.206 / 2,
+                        offsetY: layer.canvas.height * 0.1938 / 2,
+                        draggable: true
                     });
                     layer.add(robot);
 
@@ -56,6 +63,10 @@ export default {
                         resizeEnabled: false,
                         borderEnabled: false,
                         anchorSize: 0,
+                        borderStroke: "lightsteelblue",
+                        anchorStroke: "lightsteelblue",
+                        anchorFill: "lightsteelblue",
+                        borderStrokeWidth: 2,
                     });
                     layer.add(transformer);
 
@@ -64,10 +75,10 @@ export default {
                         transformer.borderEnabled(true);
                         transformer.anchorSize(10);
                     });
-                    robot.on(
-                        "mousedown",
-                        () => (document.body.style.cursor = "grabbing")
-                    );
+                    robot.on("mousedown", () => {
+                        this.$emit("stopSimulation");
+                        document.body.style.cursor = "grabbing";
+                    });
                     robot.on("mouseup", () => (document.body.style.cursor = "grab"));
                     robot.on("mouseout", () => {
                         document.body.style.cursor = "default";
@@ -82,26 +93,32 @@ export default {
                         "dragend",
                         () =>
                             (vehicle.pose = {
-                                x: robot.x(),
-                                y: robot.y(),
+                                x: this.convertToMeters(robot.x()),
+                                y: this.convertToMeters(robot.y()),
                                 theta: robot.rotation(),
                             })
                     );
+                    robot.on("transformstart", () => this.$emit("stopSimulation"));
                     robot.on("transformend", () => {
                         vehicle.pose = {
-                            x: robot.x(),
-                            y: robot.y(),
+                            x: this.convertToMeters(robot.x()),
+                            y: this.convertToMeters(robot.y()),
                             theta: robot.rotation(),
                         };
-                        console.log("transformend")
                         setTimeout(() => {
-                                transformer.borderEnabled(false);
-                                transformer.anchorSize(0);
+                            transformer.borderEnabled(false);
+                            transformer.anchorSize(0);
                         }, 2000);
                     });
                 };
             });
         },
+        convertToPixels(meter) {
+            return meter / 1.189 * this.$refs.container.clientWidth;
+        },
+        convertToMeters(pixel) {
+            return pixel * 1.189 / this.$refs.container.clientWidth;
+        }
     },
 };
 </script>
@@ -115,7 +132,7 @@ export default {
     left: 40px;
 }
 
-.container {
+.area {
     overflow: hidden;
     margin: auto;
     height: 100%;
@@ -124,5 +141,10 @@ export default {
     background: white;
     border: 5px solid steelblue;
     border-radius: 15px;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
 }
 </style>

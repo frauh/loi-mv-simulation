@@ -1,5 +1,5 @@
 import Simulator from "@/compositions/simulator/Simulator";
-import WorkerKey from "@/compositions/simulation/WorkerKey";
+import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 
 export default class BasicSimulator extends Simulator {
     constructor(vehicleColor, vehicleLabel) {
@@ -15,9 +15,6 @@ export default class BasicSimulator extends Simulator {
     simulateLEDs(msg) {
         let style = "<p style='font-size:14px; padding-left: 3px; padding-right: 3px;'>";
         let label = "".concat("<b style='color:", this._vehicleColor, "'>", this._vehicleLabel, ": </b>");
-        self.postMessage({
-            key: WorkerKey.outputLog,
-            value: style.concat(label, msg, "</p>"),
-        });
+        this.commit(WorkerMessageKey.outputLog, style.concat(label, msg, "</p>"));
     }
 }
