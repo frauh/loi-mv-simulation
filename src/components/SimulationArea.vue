@@ -18,9 +18,9 @@ export default {
         vehicles: Array,
     },
     data() {
-        return{
-            layer: null
-        }
+        return {
+            layer: null,
+        };
     },
     mounted() {
         let stage = new Konva.Stage({
@@ -50,13 +50,14 @@ export default {
                         // Verhältnis Roboter zu DIN-A0
                         width: layer.canvas.width * 0.206,
                         height: layer.canvas.height * 0.1938,
-                        offsetX: layer.canvas.width * 0.206 / 2,
-                        offsetY: layer.canvas.height * 0.1938 / 2,
-                        draggable: true
+                        offsetX: (layer.canvas.width * 0.206) / 2,
+                        offsetY: (layer.canvas.height * 0.1938) / 2,
+                        draggable: true,
                     });
                     layer.add(robot);
 
                     let transformer = new Konva.Transformer({
+                        //TODO Rotation 360 oder -180?
                         nodes: [robot],
                         centeredScaling: true,
                         rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
@@ -103,7 +104,7 @@ export default {
                         vehicle.pose = {
                             x: this.convertToMeters(robot.x()),
                             y: this.convertToMeters(robot.y()),
-                            theta: robot.rotation(),
+                            theta: (robot.rotation() + 360) % 360,
                         };
                         setTimeout(() => {
                             transformer.borderEnabled(false);
@@ -114,11 +115,11 @@ export default {
             });
         },
         convertToPixels(meter) {
-            return meter / 1.189 * this.$refs.container.clientWidth;
+            return (meter / 1.189) * this.$refs.container.clientWidth;
         },
         convertToMeters(pixel) {
-            return pixel * 1.189 / this.$refs.container.clientWidth;
-        }
+            return (pixel * 1.189) / this.$refs.container.clientWidth;
+        },
     },
 };
 </script>

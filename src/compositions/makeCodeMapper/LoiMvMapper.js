@@ -2,6 +2,7 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'LOI_MV' für micro:bit V1
+ * vgl. https://github.com/eschaetz/loi-mv-sek1
  */
 export default class LoiMvMapper extends Mapper {
     /**
@@ -19,7 +20,8 @@ export default class LoiMvMapper extends Mapper {
      * @param tolleranz Number
      */
     graddrehung(drehung, tolleranz) {
-        console.log(drehung, tolleranz);
+        this.unused("LOI_MV.graddrehung", tolleranz);
+        this._simulator.simulateRotation(drehung)
     }
 
     helligkeitLinks() {
@@ -30,13 +32,14 @@ export default class LoiMvMapper extends Mapper {
 
     /**
      *
-     * @param power Number
-     * @param lenkung Number
+     * @param power Number (-10...10)
+     * @param lenkung Number (-10...10)
      */
     antrieb(power, lenkung) {
-        console.log("antrieb", power, lenkung);
+        this._simulator.simulateMotors(power, lenkung);
     }
 
     ultraschall() {
     }
+
 }

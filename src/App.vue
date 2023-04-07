@@ -58,11 +58,8 @@ export default {
         //TODO for testing
         let vehicle = new Vehicle("red", "test");
         vehicle.program = parseProgramCode(
-            "basic.forever(function () {\n" +
-            "    LOI_MV.antrieb(10, 0)\n" +
-            "    basic.pause(100)\n" +
-            "    LOI_MV.antrieb(0, 0)\n" +
-            "})\n"
+            // "LOI_MV.antrieb(10, 0)\nbasic.pause(100)\nLOI_MV.antrieb(0, 0)\n"
+            "LOI_MV.graddrehung(90, 0)\n"
         );
         this.vehicles.push(vehicle);
     },

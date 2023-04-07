@@ -28,17 +28,23 @@ export default function parseProgramCode(code) {
 function separateStartFrom(code) {
     let program = {start: "", functions: []};
     let split = code.concat("\n").split("})\n");
-    console.log(split[split.length - 1].trim())
     if (!split[split.length - 1] || !split[split.length - 1].trim()) {
         split.pop();
     }
     split.forEach((line) => {
         if (!startsAsFunction(line)) {
-            let newStart = line.slice(0, line.search("\n.*function") + 1);
-            program.start = program.start.concat(newStart);
-            line = line.slice(newStart.length);
+            if (line.includes("function")){
+                let newStart = line.slice(0, line.search("\n.*function") + 1);
+                program.start = program.start.concat(newStart);
+                line = line.slice(newStart.length);
+                if (line.trim()) {
+                    program.functions.push(line.concat("})\n"));
+                }
+            } else {
+                program.start = line;
+            }
         }
-        program.functions.push(line.concat("})\n"));
+
     });
     return program;
 }

@@ -20,8 +20,6 @@ export default class Simulation {
      * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
      */
     start() {
-        //TODO escape entrypoint oder als event verarbeiten
-        //FIXME Aufruf später mit try/catch
         let startTime = Date.now();
 
         this._vehicles.forEach(vehicle => {
@@ -34,17 +32,24 @@ export default class Simulation {
                 startTime: startTime,
                 pose: [vehicle.pose.x, vehicle.pose.y, vehicle.pose.theta],
             });
-            let isCalculating = false
+            let isCalculating = false;
+            let hasAlreadyFinished = false;
             worker.onmessage = ({data: {key, value}}) => {
+                console.log(key, value)
                 switch (key) {
                     case WorkerMessageKey.evalFinished:
                         if(!isCalculating) {
                             this._workers.splice(this._workers.indexOf(worker), 1);
                             worker.terminate();
                         }
+                        hasAlreadyFinished = value;
                         break;
                     case WorkerMessageKey.intervalCalculating:
                         isCalculating = value;
+                        if (hasAlreadyFinished) {
+                            this._workers.splice(this._workers.indexOf(worker), 1);
+                            worker.terminate();
+                        }
                         break;
                     case WorkerMessageKey.outputLog:
                         this._logArea.output = this._logArea.output.concat(value);
