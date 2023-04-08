@@ -25,15 +25,17 @@ export default class LoiMvSimulator extends Simulator {
     let vR;
     let vL;
     if (turn < 0) {
-      vR = this.#translateToSpeed(power);
+      // Linksdrehung
       vL = this.#translateToSpeed(power + ((2 * power) / 10) * turn);
+      vR = this.#translateToSpeed(power);
     } else if (turn > 0) {
-      vR = this.#translateToSpeed(power + ((2 * power) / 10) * turn);
+      // Rechtsdrehung
       vL = this.#translateToSpeed(power);
+      vR = this.#translateToSpeed(power - ((2 * power) / 10) * turn);
     } else {
       vR = vL = this.#translateToSpeed(power);
     }
-    this.#startPermanentCalculation(vR, vL);
+    this.#startPermanentCalculation(vL, vR);
   }
 
   simulateRotation(angle) {

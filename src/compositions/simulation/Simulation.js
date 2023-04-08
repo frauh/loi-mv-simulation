@@ -3,16 +3,6 @@ import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 export default class Simulation {
   _workers = [];
 
-  constructor(logArea) {
-    this._logArea = logArea;
-  }
-
-  _vehicles = [];
-
-  set vehicles(value) {
-    this._vehicles = value;
-  }
-
   get isRunning() {
     return this._workers.length > 0;
   }
@@ -20,10 +10,10 @@ export default class Simulation {
   /**
    * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
    */
-  start() {
+  start(vehicles, logArea) {
     let startTime = Date.now();
 
-    this._vehicles.forEach((vehicle) => {
+    vehicles.forEach((vehicle) => {
       vehicle.startPose = vehicle.pose;
 
       if (vehicle.program && vehicle.program.start) {
@@ -61,7 +51,7 @@ export default class Simulation {
               }
               break;
             case WorkerMessageKey.outputLog:
-              this._logArea.output = this._logArea.output.concat(value);
+              logArea.output = logArea.output.concat(value);
               break;
             case WorkerMessageKey.pose:
               vehicle.pose = { x: value[0], y: value[1], theta: value[2] };

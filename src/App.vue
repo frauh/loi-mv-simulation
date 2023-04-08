@@ -13,7 +13,7 @@
     </div>
     <div class="col-right">
       <VehicleList
-        :vehicles="vehicles"
+        :vehicles="Array.from(vehicles.values())"
         title="Fahrzeuge"
         @addVehicle="addVehicle"
         @deleteVehicle="deleteVehicle"
@@ -47,9 +47,9 @@ export default {
   },
   data() {
     return {
-      vehicles: [],
+      vehicles: new Map(),
       objects: [],
-      simulation: new Simulation(this.$refs.logArea),
+      simulation: new Simulation(),
       vehicleLayer: new Konva.Layer(),
       vehicleImages: new Map(),
       animation: null,
@@ -59,39 +59,48 @@ export default {
     //TODO for testing
     let vehicle = new Vehicle("red", "test");
     vehicle.program = parseProgramCode(
-      // "LOI_MV.antrieb(10, 3)\nbasic.pause(2000)\nLOI_MV.antrieb(0, 0)\n"
-      "LOI_MV.graddrehung(90, 0)\n"
+      "LOI_MV.antrieb(8, 2)\nbasic.pause(2000)\n" +
+        "LOI_MV.antrieb(-8, 2)\nbasic.pause(2000)\n" +
+        "LOI_MV.antrieb(8, -2)\nbasic.pause(2000)\n" +
+        "LOI_MV.antrieb(-8, -2)\nbasic.pause(2000)\n" +
+        "LOI_MV.antrieb(0, 0)\n"
+      // "LOI_MV.graddrehung(90, 0)\n"
     );
-    this.vehicles.push(vehicle);
-    // let robo = new Vehicle("green", "robo");
-    // robo.program = parseProgramCode(
-    //   "LOI_MV.antrieb(10, 0)\nbasic.pause(1000)\nLOI_MV.antrieb(0, 0)\n"
-    //   // "LOI_MV.graddrehung(-90, 0)\n"
-    // );
-    // this.vehicles.push(robo);
-    this.drawVehiclesInside(this.vehicleLayer);
+    this.vehicles.set(vehicle.id, vehicle);
+    let robo = new Vehicle("green", "robo");
+    robo.program = parseProgramCode(
+      "LOI_MV.antrieb(10, 0)\nbasic.pause(1000)\nLOI_MV.antrieb(0, 0)\n"
+      // "LOI_MV.graddrehung(-90, 0)\n"
+    );
+    this.vehicles.set(robo.id, robo);
+
+    this.drawAllVehiclesInside(this.vehicleLayer);
   },
   updated() {
-    if (!this.simulation.isRunning) {
-      if (this.animation && this.animation.isRunning) {
-        this.animation.stop();
-      }
+    if (
+      !this.simulation.isRunning &&
+      this.animation &&
+      this.animation.isRunning
+    ) {
+      this.animation.stop();
     }
   },
   methods: {
     runSimulation() {
       // TODO erst den Untergrund des Canvas nehmen?
       this.animation = new Konva.Animation(() => {
-        this.vehicles.forEach((vehicle) => {
-          let image = this.vehicleImages.get(vehicle.id);
+        this.vehicles.forEach((vehicle, id) => {
+          let image = this.vehicleImages.get(id);
           image.x(this.convertToPixels(vehicle.pose.x));
           image.y(this.convertToPixels(vehicle.pose.y));
           image.rotate(vehicle.pose.theta - image.rotation());
         });
       }, this.vehicleLayer);
       this.animation.start();
-      this.simulation.vehicles = this.vehicles;
-      this.simulation.start();
+      this.simulation.start(
+        Array.from(this.vehicles.values()),
+        this.$refs.logArea
+      );
     },
     stopSimulation() {
       this.simulation.stop();
@@ -102,121 +111,110 @@ export default {
     resetSimulation() {
       this.stopSimulation();
       this.$refs.logArea.$data.output = "";
-      this.vehicles.forEach((vehicle) => {
-        console.log("Pose", vehicle.pose, "start", vehicle.startPose);
+      this.vehicles.forEach((vehicle, id) => {
         vehicle.pose = vehicle.startPose;
-        this.vehicles.forEach((vehicle) => {
-          let image = this.vehicleImages.get(vehicle.id);
-          image.x(this.convertToPixels(vehicle.pose.x));
-          image.y(this.convertToPixels(vehicle.pose.y));
-          image.rotation(vehicle.pose.theta);
-        });
+        let image = this.vehicleImages.get(id);
+        image.x(this.convertToPixels(vehicle.pose.x));
+        image.y(this.convertToPixels(vehicle.pose.y));
+        image.rotation(vehicle.pose.theta);
       });
     },
     addVehicle(vehicle) {
-      this.vehicles = [...this.vehicles, vehicle];
-      this.drawVehiclesInside(this.vehicleLayer);
+      this.vehicles.set(vehicle.id, vehicle);
+      this.drawSingleVehicleInside(this.vehicleLayer, vehicle);
     },
     deleteVehicle(id) {
-      this.vehicles = this.vehicles.filter((vehicle) => vehicle.id !== id);
+      this.vehicles.delete(id);
       this.vehicleImages.delete(id);
-      this.drawVehiclesInside(this.vehicleLayer);
+      this.drawAllVehiclesInside(this.vehicleLayer);
     },
     toggleTracking(id) {
-      this.vehicles = this.vehicles.map((vehicle) =>
-        vehicle.id === id
-          ? { ...vehicle, isTracked: !vehicle.isTracked }
-          : vehicle
-      );
+      this.vehicles.get(id).isTracked = !this.vehicles.get(id).isTracked;
     },
     async programUpload(id, file) {
       await readMakeCodeFileAsynchronous(file).then(
-        (result) =>
-          (this.vehicles = this.vehicles.map((vehicle) =>
-            vehicle.id === id
-              ? { ...vehicle, program: parseProgramCode(result) }
-              : vehicle
-          ))
+        (result) => (this.vehicles.get(id).program = parseProgramCode(result))
       );
     },
-    drawVehiclesInside(layer) {
+    drawAllVehiclesInside(layer) {
       layer.destroyChildren();
       this.animations = [];
       this.vehicles.forEach((vehicle) => {
-        let image = new Image();
-        image.src = require(`@/assets/top-${vehicle.color}.png`);
-        image.onload = () => {
-          let robot = new Konva.Image({
-            image: image,
-            x: this.convertToPixels(vehicle.pose.x),
-            y: this.convertToPixels(vehicle.pose.y),
-            rotation: vehicle.pose.theta,
-            // Verhältnis Roboter zu DIN-A0
-            width: layer.canvas.width * 0.206,
-            height: layer.canvas.height * 0.1938,
-            offsetX: (layer.canvas.width * 0.206) / 2,
-            offsetY: (layer.canvas.height * 0.1938) / 2,
-            draggable: true,
-          });
-          layer.add(robot);
-          this.vehicleImages.set(vehicle.id, robot);
+        this.drawSingleVehicleInside(layer, vehicle);
+      });
+    },
+    drawSingleVehicleInside(layer, vehicle) {
+      let image = new Image();
+      image.src = require(`@/assets/top-${vehicle.color}.png`);
+      image.onload = () => {
+        let konvaImage = new Konva.Image({
+          image: image,
+          x: this.convertToPixels(vehicle.pose.x),
+          y: this.convertToPixels(vehicle.pose.y),
+          rotation: vehicle.pose.theta,
+          // Verhältnis Roboter zu DIN-A0
+          width: layer.canvas.width * 0.206,
+          height: layer.canvas.height * 0.1938,
+          offsetX: (layer.canvas.width / 2) * 0.206,
+          offsetY: (layer.canvas.height / 2) * 0.1938,
+          draggable: true,
+        });
+        layer.add(konvaImage);
+        this.vehicleImages.set(vehicle.id, konvaImage);
 
-          let transformer = new Konva.Transformer({
-            nodes: [robot],
-            centeredScaling: true,
-            rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
-            resizeEnabled: false,
-            borderEnabled: false,
-            anchorSize: 0,
-            borderStroke: "lightsteelblue",
-            anchorStroke: "lightsteelblue",
-            anchorFill: "lightsteelblue",
-            borderStrokeWidth: 2,
-          });
-          layer.add(transformer);
+        let transformer = new Konva.Transformer({
+          nodes: [konvaImage],
+          centeredScaling: true,
+          rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
+          resizeEnabled: false,
+          borderEnabled: false,
+          anchorSize: 0,
+          borderStroke: "lightsteelblue",
+          anchorStroke: "lightsteelblue",
+          anchorFill: "lightsteelblue",
+          borderStrokeWidth: 2,
+        });
+        layer.add(transformer);
 
-          robot.on("mouseenter", () => {
-            document.body.style.cursor = "grab";
-            transformer.borderEnabled(true);
-            transformer.anchorSize(10);
-          });
-          robot.on("mousedown", () => {
-            this.$emit("stopSimulation");
-            document.body.style.cursor = "grabbing";
-          });
-          robot.on("mouseup", () => (document.body.style.cursor = "grab"));
-          robot.on("mouseout", () => {
-            document.body.style.cursor = "default";
-            setTimeout(() => {
-              if (!transformer.isTransforming()) {
-                transformer.borderEnabled(false);
-                transformer.anchorSize(0);
-              }
-            }, 2000);
-          });
-          robot.on(
-            "dragend",
-            () =>
-              (vehicle.pose = {
-                x: this.convertToMeters(robot.x()),
-                y: this.convertToMeters(robot.y()),
-                theta: robot.rotation(),
-              })
-          );
-          robot.on("transformstart", () => this.$emit("stopSimulation"));
-          robot.on("transformend", () => {
-            vehicle.pose = {
-              x: this.convertToMeters(robot.x()),
-              y: this.convertToMeters(robot.y()),
-              theta: (robot.rotation() + 360) % 360,
-            };
-            setTimeout(() => {
+        konvaImage.on("mouseenter", () => {
+          document.body.style.cursor = "grab";
+          transformer.borderEnabled(true);
+          transformer.anchorSize(10);
+        });
+        konvaImage.on("mousedown", () => {
+          this.$emit("stopSimulation");
+          document.body.style.cursor = "grabbing";
+        });
+        konvaImage.on("mouseup", () => (document.body.style.cursor = "grab"));
+        konvaImage.on("mouseout", () => {
+          document.body.style.cursor = "default";
+          setTimeout(() => {
+            if (!transformer.isTransforming()) {
               transformer.borderEnabled(false);
               transformer.anchorSize(0);
-            }, 2000);
-          });
-        };
-      });
+            }
+          }, 2000);
+        });
+        konvaImage.on("dragend", () => {
+          vehicle.pose = {
+            x: this.convertToMeters(konvaImage.x()),
+            y: this.convertToMeters(konvaImage.y()),
+            theta: konvaImage.rotation(),
+          };
+        });
+        konvaImage.on("transformstart", () => this.$emit("stopSimulation"));
+        konvaImage.on("transformend", () => {
+          vehicle.pose = {
+            x: this.convertToMeters(konvaImage.x()),
+            y: this.convertToMeters(konvaImage.y()),
+            theta: (konvaImage.rotation() + 360) % 360,
+          };
+          setTimeout(() => {
+            transformer.borderEnabled(false);
+            transformer.anchorSize(0);
+          }, 2000);
+        });
+      };
     },
     convertToPixels(meter) {
       // Größenverhältnis zu DIN-A0
