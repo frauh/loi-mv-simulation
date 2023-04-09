@@ -51,6 +51,7 @@ export default {
       simulation: new Simulation(),
       vehicleLayer: new Konva.Layer(),
       vehicleModels: new Map(),
+      vehicleTraces: new Map(),
       animation: null,
     };
   },
@@ -67,14 +68,14 @@ export default {
       // "LOI_MV.graddrehung(90, 0)\n"
     );
     this.vehicles.set(vehicle.id, vehicle);
-    // let robo = new Vehicle("green", "robo");
-    // robo.program = parseProgramCode(
-    //   "LOI_MV.antrieb(10, 0)\nbasic.pause(1000)\nLOI_MV.antrieb(0, 0)\n"
-    //   // "LOI_MV.graddrehung(-90, 0)\n"
-    // );
-    // this.vehicles.set(robo.id, robo);
-
-    this.drawAllVehiclesInside(this.vehicleLayer);
+    this.drawVehicleModelInto(this.vehicleLayer, vehicle);
+    let robo = new Vehicle("blue", "robo");
+    robo.program = parseProgramCode(
+      "LOI_MV.antrieb(10, 3)\nbasic.pause(3000)\nLOI_MV.antrieb(0, 0)\n"
+      // "LOI_MV.graddrehung(-90, 0)\n"
+    );
+    this.vehicles.set(robo.id, robo);
+    this.drawVehicleModelInto(this.vehicleLayer, robo);
   },
   updated() {
     if (
@@ -87,43 +88,11 @@ export default {
   },
   methods: {
     runSimulation() {
-      // TODO erst den Untergrund des Canvas nehmen?
-      this.animation = new Konva.Animation(() => {
-        this.vehicles.forEach((vehicle, id) => {
-          let model = this.vehicleModels.get(id);
-          model.x(this.convertToPixels(vehicle.pose.x));
-          model.y(this.convertToPixels(vehicle.pose.y));
-          model.rotate(vehicle.pose.theta - model.rotation());
-
-          model
-            .getChildren((node) => node.getClassName() === "Circle")[0]
-            .setAttrs({
-              fill:
-                vehicle.neoPixelColor !== "rainbow"
-                  ? vehicle.neoPixelColor
-                  : "",
-              fillRadialGradientColorStops:
-                vehicle.neoPixelColor === "rainbow"
-                  ? [
-                      0,
-                      "purple",
-                      2 / 7,
-                      "blue",
-                      3 / 7,
-                      "lightblue",
-                      4 / 7,
-                      "green",
-                      5 / 7,
-                      "yellow",
-                      6 / 7,
-                      "orange",
-                      1,
-                      "red",
-                    ]
-                  : [],
-            });
-        });
-      }, this.vehicleLayer);
+      this.vehicleTraces.forEach((trace) => trace.points([]));
+      this.animation = new Konva.Animation(
+        this.createAnimation,
+        this.vehicleLayer
+      );
       this.animation.start();
       this.simulation.start(
         Array.from(this.vehicles.values()),
@@ -141,20 +110,23 @@ export default {
       this.$refs.logArea.$data.output = "";
       this.vehicles.forEach((vehicle, id) => {
         vehicle.pose = vehicle.startPose;
-        let model = this.vehicleModels.get(id);
-        model.x(this.convertToPixels(vehicle.pose.x));
-        model.y(this.convertToPixels(vehicle.pose.y));
-        model.rotation(vehicle.pose.theta);
+        this.vehicleModels.get(id).setAttrs({
+          x: this.convertToPixels(vehicle.pose.x),
+          y: this.convertToPixels(vehicle.pose.y),
+          rotation: vehicle.pose.theta,
+        });
       });
     },
     addVehicle(vehicle) {
       this.vehicles.set(vehicle.id, vehicle);
-      this.drawSingleVehicleInside(this.vehicleLayer, vehicle);
+      this.drawVehicleModelInto(this.vehicleLayer, vehicle);
     },
     deleteVehicle(id) {
       this.vehicles.delete(id);
       this.vehicleModels.get(id).destroy();
       this.vehicleModels.delete(id);
+      this.vehicleTraces.get(id).destroy();
+      this.vehicleTraces.delete(id);
     },
     toggleTracking(id) {
       this.vehicles.get(id).isTracked = !this.vehicles.get(id).isTracked;
@@ -164,16 +136,21 @@ export default {
         (result) => (this.vehicles.get(id).program = parseProgramCode(result))
       );
     },
-    drawAllVehiclesInside(layer) {
-      layer.destroyChildren();
-      this.vehicles.forEach((vehicle) => {
-        this.drawSingleVehicleInside(layer, vehicle);
-      });
-    },
-    drawSingleVehicleInside(layer, vehicle) {
+    drawVehicleModelInto(layer, vehicle) {
       let image = new Image();
       image.src = require(`@/assets/top-${vehicle.color}.png`);
       image.onload = () => {
+        // Linie zum Fahrspur verfolgen
+        let trace = new Konva.Line({
+          stroke: vehicle.color,
+          strokeWidth: 2,
+          lineCap: "round",
+          lineJoin: "round",
+        });
+        layer.add(trace);
+        this.vehicleTraces.set(vehicle.id, trace);
+
+        // Gruppe, in der alle Formen enthalten sind
         let model = new Konva.Group({
           x: this.convertToPixels(vehicle.pose.x),
           y: this.convertToPixels(vehicle.pose.y),
@@ -183,6 +160,7 @@ export default {
         layer.add(model);
         this.vehicleModels.set(vehicle.id, model);
 
+        // Abbildung des Roboters
         let topView = new Konva.Image({
           image: image,
           // Verhältnis Roboter zu DIN-A0
@@ -195,6 +173,7 @@ export default {
         });
         model.add(topView);
 
+        // NeoPixel, der auf dem Fahrzeug dargestellt wird
         let neoPixel = new Konva.Circle({
           x: this.convertToPixels(0.075),
           radius: this.convertToPixels(0.02),
@@ -226,6 +205,7 @@ export default {
         });
         model.add(neoPixel);
 
+        // macht das Modell drehbar
         let transformer = new Konva.Transformer({
           nodes: [model],
           centeredScaling: true,
@@ -240,6 +220,7 @@ export default {
         });
         layer.add(transformer);
 
+        // Eventhandling insbes. fürs Transformieren
         let mouseOver = false;
         model.on("mouseenter", () => {
           document.body.style.cursor = "grab";
@@ -286,6 +267,48 @@ export default {
           }, 2000);
         });
       };
+    },
+    createAnimation() {
+      this.vehicles.forEach((vehicle, id) => {
+        // Kinematik
+        let model = this.vehicleModels.get(id);
+        model.x(this.convertToPixels(vehicle.pose.x));
+        model.y(this.convertToPixels(vehicle.pose.y));
+        model.rotate(vehicle.pose.theta - model.rotation());
+
+        // Neopixel wird ggf. ein oder ausgeschaltet
+        model
+          .getChildren((node) => node.getClassName() === "Circle")[0]
+          .setAttrs({
+            fill:
+              vehicle.neoPixelColor !== "rainbow" ? vehicle.neoPixelColor : "",
+            fillRadialGradientColorStops:
+              vehicle.neoPixelColor === "rainbow"
+                ? [
+                    0,
+                    "purple",
+                    2 / 7,
+                    "blue",
+                    3 / 7,
+                    "lightblue",
+                    4 / 7,
+                    "green",
+                    5 / 7,
+                    "yellow",
+                    6 / 7,
+                    "orange",
+                    1,
+                    "red",
+                  ]
+                : [],
+          });
+
+        // gefahrene Wegstrecke anzeigen
+        if (vehicle.isTracked) {
+          let trace = this.vehicleTraces.get(vehicle.id);
+          trace.points(trace.points().concat([model.x(), model.y()]));
+        }
+      });
     },
     convertToPixels(meter) {
       // Größenverhältnis zu DIN-A0
