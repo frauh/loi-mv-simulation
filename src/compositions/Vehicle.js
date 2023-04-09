@@ -7,6 +7,7 @@ export default class Vehicle {
   program = { start: "", functions: [] };
   pose;
   startPose;
+  neoPixelColor = "";
 
   constructor(color, label) {
     this.id = Math.floor(Math.random() * 100000);

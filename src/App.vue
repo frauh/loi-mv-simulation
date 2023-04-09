@@ -48,31 +48,31 @@ export default {
   data() {
     return {
       vehicles: new Map(),
-      objects: [],
       simulation: new Simulation(),
       vehicleLayer: new Konva.Layer(),
-      vehicleImages: new Map(),
+      vehicleModels: new Map(),
       animation: null,
     };
   },
   created() {
     //TODO for testing
-    let vehicle = new Vehicle("red", "test");
+    let vehicle = new Vehicle("green", "test");
     vehicle.program = parseProgramCode(
-      "LOI_MV.antrieb(8, 2)\nbasic.pause(2000)\n" +
-        "LOI_MV.antrieb(-8, 2)\nbasic.pause(2000)\n" +
-        "LOI_MV.antrieb(8, -2)\nbasic.pause(2000)\n" +
-        "LOI_MV.antrieb(-8, -2)\nbasic.pause(2000)\n" +
+      "LOI_MV.init(false)\n" +
+        "let strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\n" +
+        "strip.showRainbow(1, 360)\n" +
+        "LOI_MV.antrieb(10, 0)\n" +
+        "basic.pause(2000)\n" +
         "LOI_MV.antrieb(0, 0)\n"
       // "LOI_MV.graddrehung(90, 0)\n"
     );
     this.vehicles.set(vehicle.id, vehicle);
-    let robo = new Vehicle("green", "robo");
-    robo.program = parseProgramCode(
-      "LOI_MV.antrieb(10, 0)\nbasic.pause(1000)\nLOI_MV.antrieb(0, 0)\n"
-      // "LOI_MV.graddrehung(-90, 0)\n"
-    );
-    this.vehicles.set(robo.id, robo);
+    // let robo = new Vehicle("green", "robo");
+    // robo.program = parseProgramCode(
+    //   "LOI_MV.antrieb(10, 0)\nbasic.pause(1000)\nLOI_MV.antrieb(0, 0)\n"
+    //   // "LOI_MV.graddrehung(-90, 0)\n"
+    // );
+    // this.vehicles.set(robo.id, robo);
 
     this.drawAllVehiclesInside(this.vehicleLayer);
   },
@@ -90,10 +90,38 @@ export default {
       // TODO erst den Untergrund des Canvas nehmen?
       this.animation = new Konva.Animation(() => {
         this.vehicles.forEach((vehicle, id) => {
-          let image = this.vehicleImages.get(id);
-          image.x(this.convertToPixels(vehicle.pose.x));
-          image.y(this.convertToPixels(vehicle.pose.y));
-          image.rotate(vehicle.pose.theta - image.rotation());
+          let model = this.vehicleModels.get(id);
+          model.x(this.convertToPixels(vehicle.pose.x));
+          model.y(this.convertToPixels(vehicle.pose.y));
+          model.rotate(vehicle.pose.theta - model.rotation());
+
+          model
+            .getChildren((node) => node.getClassName() === "Circle")[0]
+            .setAttrs({
+              fill:
+                vehicle.neoPixelColor !== "rainbow"
+                  ? vehicle.neoPixelColor
+                  : "",
+              fillRadialGradientColorStops:
+                vehicle.neoPixelColor === "rainbow"
+                  ? [
+                      0,
+                      "purple",
+                      2 / 7,
+                      "blue",
+                      3 / 7,
+                      "lightblue",
+                      4 / 7,
+                      "green",
+                      5 / 7,
+                      "yellow",
+                      6 / 7,
+                      "orange",
+                      1,
+                      "red",
+                    ]
+                  : [],
+            });
         });
       }, this.vehicleLayer);
       this.animation.start();
@@ -113,10 +141,10 @@ export default {
       this.$refs.logArea.$data.output = "";
       this.vehicles.forEach((vehicle, id) => {
         vehicle.pose = vehicle.startPose;
-        let image = this.vehicleImages.get(id);
-        image.x(this.convertToPixels(vehicle.pose.x));
-        image.y(this.convertToPixels(vehicle.pose.y));
-        image.rotation(vehicle.pose.theta);
+        let model = this.vehicleModels.get(id);
+        model.x(this.convertToPixels(vehicle.pose.x));
+        model.y(this.convertToPixels(vehicle.pose.y));
+        model.rotation(vehicle.pose.theta);
       });
     },
     addVehicle(vehicle) {
@@ -125,8 +153,8 @@ export default {
     },
     deleteVehicle(id) {
       this.vehicles.delete(id);
-      this.vehicleImages.delete(id);
-      this.drawAllVehiclesInside(this.vehicleLayer);
+      this.vehicleModels.get(id).destroy();
+      this.vehicleModels.delete(id);
     },
     toggleTracking(id) {
       this.vehicles.get(id).isTracked = !this.vehicles.get(id).isTracked;
@@ -138,7 +166,6 @@ export default {
     },
     drawAllVehiclesInside(layer) {
       layer.destroyChildren();
-      this.animations = [];
       this.vehicles.forEach((vehicle) => {
         this.drawSingleVehicleInside(layer, vehicle);
       });
@@ -147,23 +174,60 @@ export default {
       let image = new Image();
       image.src = require(`@/assets/top-${vehicle.color}.png`);
       image.onload = () => {
-        let konvaImage = new Konva.Image({
-          image: image,
+        let model = new Konva.Group({
           x: this.convertToPixels(vehicle.pose.x),
           y: this.convertToPixels(vehicle.pose.y),
           rotation: vehicle.pose.theta,
+          draggable: true,
+        });
+        layer.add(model);
+        this.vehicleModels.set(vehicle.id, model);
+
+        let topView = new Konva.Image({
+          image: image,
           // Verhältnis Roboter zu DIN-A0
           width: layer.canvas.width * 0.206,
           height: layer.canvas.height * 0.1938,
-          offsetX: (layer.canvas.width / 2) * 0.206,
+          // Drehung um den Mittelpunkt der Achsen, nicht des Bildes
+          offsetX:
+            (layer.canvas.width / 2) * 0.206 - this.convertToPixels(0.012),
           offsetY: (layer.canvas.height / 2) * 0.1938,
-          draggable: true,
         });
-        layer.add(konvaImage);
-        this.vehicleImages.set(vehicle.id, konvaImage);
+        model.add(topView);
+
+        let neoPixel = new Konva.Circle({
+          x: this.convertToPixels(0.075),
+          radius: this.convertToPixels(0.02),
+          fill:
+            vehicle.neoPixelColor !== "rainbow" ? vehicle.neoPixelColor : "",
+          fillRadialGradientStartPoint: { x: 0, y: 0 },
+          fillRadialGradientStartRadius: 0,
+          fillRadialGradientEndPoint: { x: 0, y: 0 },
+          fillRadialGradientEndRadius: this.convertToPixels(0.02),
+          fillRadialGradientColorStops:
+            vehicle.neoPixelColor === "rainbow"
+              ? [
+                  0,
+                  "purple",
+                  2 / 7,
+                  "blue",
+                  3 / 7,
+                  "lightblue",
+                  4 / 7,
+                  "green",
+                  5 / 7,
+                  "yellow",
+                  6 / 7,
+                  "orange",
+                  1,
+                  "red",
+                ]
+              : [],
+        });
+        model.add(neoPixel);
 
         let transformer = new Konva.Transformer({
-          nodes: [konvaImage],
+          nodes: [model],
           centeredScaling: true,
           rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
           resizeEnabled: false,
@@ -176,42 +240,49 @@ export default {
         });
         layer.add(transformer);
 
-        konvaImage.on("mouseenter", () => {
+        let mouseOver = false;
+        model.on("mouseenter", () => {
           document.body.style.cursor = "grab";
           transformer.borderEnabled(true);
           transformer.anchorSize(10);
+          mouseOver = true;
         });
-        konvaImage.on("mousedown", () => {
+        model.on("mousedown", () => {
           this.$emit("stopSimulation");
           document.body.style.cursor = "grabbing";
         });
-        konvaImage.on("mouseup", () => (document.body.style.cursor = "grab"));
-        konvaImage.on("mouseout", () => {
+        model.on("mouseup", () => (document.body.style.cursor = "grab"));
+        model.on("mouseout", () => {
           document.body.style.cursor = "default";
+          mouseOver = false;
           setTimeout(() => {
             if (!transformer.isTransforming()) {
-              transformer.borderEnabled(false);
-              transformer.anchorSize(0);
+              if (!mouseOver) {
+                transformer.borderEnabled(false);
+                transformer.anchorSize(0);
+              }
             }
           }, 2000);
         });
-        konvaImage.on("dragend", () => {
+        model.on("dragend", () => {
           vehicle.pose = {
-            x: this.convertToMeters(konvaImage.x()),
-            y: this.convertToMeters(konvaImage.y()),
-            theta: konvaImage.rotation(),
+            x: this.convertToMeters(model.x()),
+            y: this.convertToMeters(model.y()),
+            theta: model.rotation(),
           };
         });
-        konvaImage.on("transformstart", () => this.$emit("stopSimulation"));
-        konvaImage.on("transformend", () => {
+        model.on("transformstart", () => this.$emit("stopSimulation"));
+        model.on("transformend", () => {
           vehicle.pose = {
-            x: this.convertToMeters(konvaImage.x()),
-            y: this.convertToMeters(konvaImage.y()),
-            theta: (konvaImage.rotation() + 360) % 360,
+            x: this.convertToMeters(model.x()),
+            y: this.convertToMeters(model.y()),
+            theta: (model.rotation() + 360) % 360,
           };
           setTimeout(() => {
-            transformer.borderEnabled(false);
-            transformer.anchorSize(0);
+            if (!mouseOver) {
+              transformer.borderEnabled(false);
+              transformer.anchorSize(0);
+            }
           }, 2000);
         });
       };

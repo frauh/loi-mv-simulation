@@ -50,11 +50,14 @@ export default class Simulation {
                 worker.terminate();
               }
               break;
+            case WorkerMessageKey.pose:
+              vehicle.pose = { x: value[0], y: value[1], theta: value[2] };
+              break;
             case WorkerMessageKey.outputLog:
               logArea.output = logArea.output.concat(value);
               break;
-            case WorkerMessageKey.pose:
-              vehicle.pose = { x: value[0], y: value[1], theta: value[2] };
+            case WorkerMessageKey.neoPixelColor:
+              vehicle.neoPixelColor = value;
               break;
             default:
               console.error(
