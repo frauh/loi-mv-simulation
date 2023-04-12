@@ -144,7 +144,7 @@ export default {
   display: table;
 }
 
-.button-group * {
+.button-group > * {
   float: left;
   width: 33.3%;
   margin: 5px;
@@ -168,7 +168,7 @@ export default {
   padding-top: 10px;
 }
 
-.modal-button-group * {
+.modal-button-group > * {
   display: inline-block;
   width: 50%;
   margin: 5px;

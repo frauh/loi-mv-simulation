@@ -10,7 +10,7 @@ export default class Simulation {
   /**
    * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
    */
-  start(vehicles, logArea) {
+  start(vehicles, backgroundLayer, logArea) {
     let startTime = Date.now();
 
     vehicles.forEach((vehicle) => {
@@ -31,6 +31,15 @@ export default class Simulation {
           vehicleLabel: vehicle.label,
           startTime: startTime,
           pose: [vehicle.pose.x, vehicle.pose.y, vehicle.pose.theta],
+          backgroundImageData: backgroundLayer
+            .getContext()
+            .getImageData(
+              0,
+              0,
+              backgroundLayer.width(),
+              backgroundLayer.height()
+            ),
+          backgroundWidth: backgroundLayer.width(),
         });
         let isCalculating = false;
         let hasAlreadyFinished = false;

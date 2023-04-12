@@ -33,10 +33,20 @@ import SonarSimulator from "@/compositions/simulator/SonarSimulator";
  * @param vehicleLabel
  * @param startTime
  * @param pose
+ * @param backgroundImageData
+ * @param backgroundWidth
  * @return {Promise<void>} outputLog,
  */
 self.onmessage = async ({
-  data: { code, vehicleColor, vehicleLabel, startTime, pose },
+  data: {
+    code,
+    vehicleColor,
+    vehicleLabel,
+    startTime,
+    pose,
+    backgroundImageData,
+    backgroundWidth,
+  },
 }) => {
   const basic = new BasicMapper(new BasicSimulator(vehicleColor, vehicleLabel));
   const input = new InputMapper(new InputSimulator(startTime, pose));
@@ -44,7 +54,9 @@ self.onmessage = async ({
   const led = new LedMapper(new LedSimulator());
   const radio = new RadioMapper(new RadioSimulator());
   const loops = new LoopsMapper(new LoopsSimulator());
-  const LOI_MV = new LoiMvMapper(new LoiMvSimulator(pose));
+  const LOI_MV = new LoiMvMapper(
+    new LoiMvSimulator(pose, backgroundImageData, backgroundWidth)
+  );
   const I2C_LCD1602 = new I2cLcdMapper(
     new I2cLcdSimulator(vehicleColor, vehicleLabel)
   );

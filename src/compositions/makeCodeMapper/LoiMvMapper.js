@@ -5,41 +5,41 @@ import Mapper from "@/compositions/makeCodeMapper/Mapper";
  * vgl. https://github.com/eschaetz/loi-mv-sek1
  */
 export default class LoiMvMapper extends Mapper {
-    /**
-     *
-     * @param kompass Boolean
-     */
-    init(kompass) {
-        this.unused("LOI_MV.init", kompass);
-        // nothing to do
-    }
+  /**
+   *
+   * @param kompass Boolean
+   */
+  init(kompass) {
+    this.unused("LOI_MV.init", kompass);
+    // nothing to do
+  }
 
-    /**
-     *
-     * @param drehung Number
-     * @param tolleranz Number
-     */
-    graddrehung(drehung, tolleranz) {
-        this.unused("LOI_MV.graddrehung", tolleranz);
-        this._simulator.simulateRotation(drehung)
-    }
+  /**
+   *
+   * @param drehung Number
+   * @param tolleranz Number
+   */
+  graddrehung(drehung, tolleranz) {
+    this.unused("LOI_MV.graddrehung", tolleranz);
+    this._simulator.simulateRotation(drehung);
+  }
 
-    helligkeitLinks() {
-    }
+  helligkeitLinks() {
+    this._simulator.simulateBrightnessLeft();
+  }
 
-    helligkeitRechts() {
-    }
+  helligkeitRechts() {
+    this._simulator.simulateBrightnessRight();
+  }
 
-    /**
-     *
-     * @param power Number (-10...10)
-     * @param lenkung Number (-10...10)
-     */
-    antrieb(power, lenkung) {
-        this._simulator.simulateMotors(power, lenkung);
-    }
+  /**
+   *
+   * @param power Number (-10...10)
+   * @param lenkung Number (-10...10)
+   */
+  antrieb(power, lenkung) {
+    this._simulator.simulateMotors(power, lenkung);
+  }
 
-    ultraschall() {
-    }
-
+  ultraschall() {}
 }

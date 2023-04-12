@@ -1,14 +1,21 @@
 import Simulator from "@/compositions/simulator/Simulator";
 import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
+import { calculateNewPose } from "@/compositions/simulation/KinematicModel";
 import {
-  calculateNewPose,
   deltaT,
-} from "@/compositions/simulation/KinematicModel";
+  photocellOffset,
+  photocellOffsetAngle,
+  toPixel,
+  toRadian,
+} from "@/compositions/Consts";
 
 export default class LoiMvSimulator extends Simulator {
-  constructor(pose) {
+  constructor(pose, backgroundImageData, backgroundWidth) {
     super();
-    this._pose = pose; // 0:x, 1:y, 2:theta
+    // 0:x, 1:y, 2:theta
+    this._pose = pose;
+    this._backgroundImageData = backgroundImageData;
+    this._backgroundWidth = backgroundWidth;
     this._calculationInterval = null;
   }
 
@@ -110,5 +117,50 @@ export default class LoiMvSimulator extends Simulator {
    */
   #translateToSpeed(power) {
     return power / 40;
+  }
+
+  simulateBrightnessLeft() {
+    const x = Math.floor(
+      toPixel(
+        this._pose.x +
+          Math.cos(toRadian(this._pose.theta - photocellOffsetAngle)) *
+            photocellOffset,
+        this._backgroundWidth
+      )
+    );
+    const y = Math.floor(
+      toPixel(
+        this._pose.y +
+          Math.sin(toRadian(this._pose.theta - photocellOffsetAngle)) *
+            photocellOffset,
+        this._backgroundWidth
+      )
+    );
+    return this.#isDarkAtPosition(x, y);
+  }
+
+  simulateBrightnessRight() {
+    const x = Math.floor(
+      toPixel(
+        this._pose.x +
+          Math.cos(toRadian(this._pose.theta + photocellOffsetAngle)) *
+            photocellOffset,
+        this._backgroundWidth
+      )
+    );
+    const y = Math.floor(
+      toPixel(
+        this._pose.y +
+          Math.sin(toRadian(this._pose.theta + photocellOffsetAngle)) *
+            photocellOffset,
+        this._backgroundWidth
+      )
+    );
+    return this.#isDarkAtPosition(x, y);
+  }
+
+  #isDarkAtPosition(x, y) {
+    const index = 4 * (y * this._backgroundWidth + x);
+    return this._backgroundImageData[index] > 0; //TODO hell oder dunkel?
   }
 }

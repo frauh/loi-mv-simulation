@@ -1,14 +1,28 @@
 <template>
   <div class="row">
     <div class="col-left">
-      <SimulationArea :vehicle-layer="vehicleLayer" title="Simulation" />
+      <SimulationArea
+        ref="simulationArea"
+        :background-layer="backgroundLayer"
+        :vehicle-layer="vehicleLayer"
+        title="Simulation"
+      />
     </div>
     <div class="col-middle">
       <ButtonBar
+        :drawing-enabled="drawingEnabled"
+        :erasing-enabled="erasingEnabled"
         :is-running="simulation.isRunning"
+        @downloadBackground="downloadBackground"
+        @drawLine="drawBackground"
+        @eraseLine="eraseBackground"
+        @removeBackgroundImage="removeBackgroundImage"
+        @removeLines="removeBackground"
         @resetSimulation="resetSimulation"
         @runSimulation="runSimulation"
+        @stopManipulatingBackground="stopManipulatingBackground"
         @stopSimulation="stopSimulation"
+        @uploadBackgroundImage="uploadBackgroundImage"
       />
     </div>
     <div class="col-right">
@@ -36,6 +50,7 @@ import Simulation from "@/compositions/simulation/Simulation";
 import parseProgramCode from "@/compositions/Parser";
 import Konva from "konva";
 import Vehicle from "@/compositions/Vehicle";
+import { toMeter, toPixel } from "@/compositions/Consts";
 
 export default {
   name: "App",
@@ -53,6 +68,9 @@ export default {
       vehicleModels: new Map(),
       vehicleTraces: new Map(),
       animation: null,
+      backgroundLayer: new Konva.Layer(),
+      drawingEnabled: false,
+      erasingEnabled: false,
     };
   },
   created() {
@@ -96,6 +114,7 @@ export default {
       this.animation.start();
       this.simulation.start(
         Array.from(this.vehicles.values()),
+        this.backgroundLayer,
         this.$refs.logArea
       );
     },
@@ -111,8 +130,8 @@ export default {
       this.vehicles.forEach((vehicle, id) => {
         vehicle.pose = vehicle.startPose;
         this.vehicleModels.get(id).setAttrs({
-          x: this.convertToPixels(vehicle.pose.x),
-          y: this.convertToPixels(vehicle.pose.y),
+          x: toPixel(vehicle.pose.x, this.vehicleLayer.width()),
+          y: toPixel(vehicle.pose.y, this.vehicleLayer.width()),
           rotation: vehicle.pose.theta,
         });
       });
@@ -152,8 +171,8 @@ export default {
 
         // Gruppe, in der alle Formen enthalten sind
         let model = new Konva.Group({
-          x: this.convertToPixels(vehicle.pose.x),
-          y: this.convertToPixels(vehicle.pose.y),
+          x: toPixel(vehicle.pose.x, this.vehicleLayer.width()),
+          y: toPixel(vehicle.pose.y, this.vehicleLayer.width()),
           rotation: vehicle.pose.theta,
           draggable: true,
         });
@@ -168,35 +187,34 @@ export default {
           height: layer.canvas.height * 0.1938,
           // Drehung um den Mittelpunkt der Achsen, nicht des Bildes
           offsetX:
-            (layer.canvas.width / 2) * 0.206 - this.convertToPixels(0.012),
+            (layer.canvas.width / 2) * 0.206 -
+            toPixel(0.0115, this.vehicleLayer.width()),
           offsetY: (layer.canvas.height / 2) * 0.1938,
         });
         model.add(topView);
 
         // NeoPixel, der auf dem Fahrzeug dargestellt wird
         let neoPixel = new Konva.Circle({
-          x: this.convertToPixels(0.075),
-          radius: this.convertToPixels(0.02),
+          x: toPixel(0.075, this.vehicleLayer.width()),
+          radius: toPixel(0.02, this.vehicleLayer.width()),
           fill:
             vehicle.neoPixelColor !== "rainbow" ? vehicle.neoPixelColor : "",
           fillRadialGradientStartPoint: { x: 0, y: 0 },
           fillRadialGradientStartRadius: 0,
           fillRadialGradientEndPoint: { x: 0, y: 0 },
-          fillRadialGradientEndRadius: this.convertToPixels(0.02),
+          fillRadialGradientEndRadius: toPixel(0.02, this.vehicleLayer.width()),
           fillRadialGradientColorStops:
             vehicle.neoPixelColor === "rainbow"
               ? [
                   0,
                   "purple",
-                  2 / 7,
+                  2 / 6,
                   "blue",
-                  3 / 7,
-                  "lightblue",
-                  4 / 7,
+                  3 / 6,
                   "green",
-                  5 / 7,
+                  4 / 6,
                   "yellow",
-                  6 / 7,
+                  5 / 6,
                   "orange",
                   1,
                   "red",
@@ -223,13 +241,15 @@ export default {
         // Eventhandling insbes. fürs Transformieren
         let mouseOver = false;
         model.on("mouseenter", () => {
-          document.body.style.cursor = "grab";
-          transformer.borderEnabled(true);
-          transformer.anchorSize(10);
-          mouseOver = true;
+          if (!this.drawingEnabled && !this.drawingEnabled) {
+            document.body.style.cursor = "grab";
+            transformer.borderEnabled(true);
+            transformer.anchorSize(10);
+            mouseOver = true;
+          }
         });
         model.on("mousedown", () => {
-          this.$emit("stopSimulation");
+          this.stopSimulation();
           document.body.style.cursor = "grabbing";
         });
         model.on("mouseup", () => (document.body.style.cursor = "grab"));
@@ -247,16 +267,16 @@ export default {
         });
         model.on("dragend", () => {
           vehicle.pose = {
-            x: this.convertToMeters(model.x()),
-            y: this.convertToMeters(model.y()),
+            x: toMeter(model.x(), this.vehicleLayer.width()),
+            y: toMeter(model.y(), this.vehicleLayer.width()),
             theta: model.rotation(),
           };
         });
         model.on("transformstart", () => this.$emit("stopSimulation"));
         model.on("transformend", () => {
           vehicle.pose = {
-            x: this.convertToMeters(model.x()),
-            y: this.convertToMeters(model.y()),
+            x: toMeter(model.x(), this.vehicleLayer.width()),
+            y: toMeter(model.y(), this.vehicleLayer.width()),
             theta: (model.rotation() + 360) % 360,
           };
           setTimeout(() => {
@@ -272,8 +292,8 @@ export default {
       this.vehicles.forEach((vehicle, id) => {
         // Kinematik
         let model = this.vehicleModels.get(id);
-        model.x(this.convertToPixels(vehicle.pose.x));
-        model.y(this.convertToPixels(vehicle.pose.y));
+        model.x(toPixel(vehicle.pose.x, this.vehicleLayer.width()));
+        model.y(toPixel(vehicle.pose.y, this.vehicleLayer.width()));
         model.rotate(vehicle.pose.theta - model.rotation());
 
         // Neopixel wird ggf. ein oder ausgeschaltet
@@ -287,15 +307,13 @@ export default {
                 ? [
                     0,
                     "purple",
-                    2 / 7,
+                    2 / 6,
                     "blue",
-                    3 / 7,
-                    "lightblue",
-                    4 / 7,
+                    3 / 6,
                     "green",
-                    5 / 7,
+                    4 / 6,
                     "yellow",
-                    6 / 7,
+                    5 / 6,
                     "orange",
                     1,
                     "red",
@@ -310,13 +328,63 @@ export default {
         }
       });
     },
-    convertToPixels(meter) {
-      // Größenverhältnis zu DIN-A0
-      return (meter / 1.189) * this.vehicleLayer.width();
+    drawBackground(size) {
+      this.erasingEnabled = false;
+      this.drawingEnabled = !this.drawingEnabled;
+      this.$refs.simulationArea.manipulateBackground(this.drawingEnabled, size);
     },
-    convertToMeters(pixel) {
-      // Größenverhältnis zu DIN-A0
-      return (pixel * 1.189) / this.vehicleLayer.width();
+    eraseBackground(size) {
+      this.drawingEnabled = false;
+      this.erasingEnabled = !this.erasingEnabled;
+      this.$refs.simulationArea.manipulateBackground(this.drawingEnabled, size);
+    },
+    removeBackground() {
+      this.backgroundLayer
+        .getChildren((node) => node.getClassName() === "Line")
+        .forEach((line) => line.destroy());
+    },
+    stopManipulatingBackground() {
+      this.drawingEnabled = false;
+      this.erasingEnabled = false;
+      this.$refs.simulationArea.stopManipulatingBackground();
+    },
+    uploadBackgroundImage(file) {
+      const URL = window.webkitURL || window.URL;
+      let image = new Image();
+      image.src = URL.createObjectURL(file);
+      image.onload = () => {
+        const konvaImage = new Konva.Image({
+          image: image,
+          x: 0,
+          y: 0,
+          width: this.backgroundLayer.width(),
+          height: this.backgroundLayer.height(),
+          rotation: image.width > image.height ? 0 : 90,
+          listening: false,
+        });
+        this.backgroundLayer.add(konvaImage);
+        konvaImage.moveToBottom();
+        konvaImage.moveUp();
+      };
+    },
+    removeBackgroundImage() {
+      this.backgroundLayer
+        .getChildren((node) => node.getClassName() === "Image")[0]
+        .destroy();
+    },
+    downloadBackground() {
+      this.downloadURI(
+        this.backgroundLayer.toDataURL({ pixelRatio: 3 }),
+        "Simulationsuntergrund.png"
+      );
+    },
+    downloadURI(uri, name) {
+      let link = document.createElement("a");
+      link.download = name;
+      link.href = uri;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
   },
 };

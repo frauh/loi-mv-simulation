@@ -1,7 +1,5 @@
 import { chain, cos, matrix, sin } from "mathjs";
-
-export const deltaT = 0.01; // in s
-const b = 0.143; // in m
+import { b, deltaT, toDegree, toRadian } from "@/compositions/Consts";
 
 export function calculateNewPose(x, y, theta, vL, vR) {
   theta = toRadian(theta);
@@ -42,12 +40,4 @@ function curve(x, y, theta, vL, vR) {
     .add(translationToICR)
     .done()
     .toArray();
-}
-
-function toRadian(degree) {
-  return degree * (Math.PI / 180);
-}
-
-function toDegree(radian) {
-  return (radian * (180 / Math.PI) + 360) % 360;
 }
