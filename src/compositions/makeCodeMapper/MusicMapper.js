@@ -1,123 +1,118 @@
-import Mapper from "@/compositions/makeCodeMapper/Mapper";
+import Simulator from "@/compositions/makeCodeMapper/Simulator";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'Musik' für micro:bit V1
  */
-export default class MusicMapper extends Mapper {
-    /**
-     * Wenn Musik
-     * Entrypoint vgl. Parser
-     * @param value MusicEvent
-     * @param handler function()
-     * @returns {*}
-     */
-    onEvent(value, handler) {
-        //TODO entrypoint
-        this.notSupported("Musik.wennMusik", value, handler);
-    }
+export default class MusicMapper extends Simulator {
+  /**
+   * Wenn Musik
+   * Entrypoint vgl. Parser
+   * @param {MusicEvent} value
+   * @param {function} handler
+   */
+  onEvent(value, handler) {
+    //TODO entrypoint
+    this.notSupported("Musik.wennMusik", value.toString(), handler.toString());
+  }
 
-    /**
-     * spiele Melodie im Tempo
-     * @param melody string
-     * @param tempo number
-     */
-    playMelody(melody, tempo) {
-        this.notSupported("Musik.spieleMelodie", melody, tempo);
-    }
+  /**
+   * spiele Melodie im Tempo
+   * @param {String} melody
+   * @param {number} tempo
+   */
+  playMelody(melody, tempo) {
+    this.notSupported("Musik.spieleMelodie", melody, tempo);
+  }
 
-    /**
-     * spiele Note für Dauer
-     * @param frequency number
-     * @param ms number
-     */
-    playTone(frequency, ms) {
-        this.notSupported("Musik.spieleNote", frequency, ms);
-    }
+  /**
+   * spiele Note für Dauer
+   * @param {number} frequency
+   * @param {number} ms
+   */
+  playTone(frequency, ms) {
+    this.notSupported("Musik.spieleNote", frequency, ms);
+  }
 
-    /**
-     * Note
-     * @param frequency number
-     */
-    ringTone(frequency) {
-        this.notSupported("Musik.Note", frequency);
-    }
+  /**
+   * Note
+   * @param {number} frequency
+   */
+  ringTone(frequency) {
+    this.notSupported("Musik.Note", frequency);
+  }
 
-    /**
-     * pausiere
-     * @param ms number
-     */
-    rest(ms) {
-        this.notSupported("Musik.pausiere", ms);
-    }
+  /**
+   * pausiere
+   * @param {number} ms
+   */
+  rest(ms) {
+    this.notSupported("Musik.pausiere", ms);
+  }
 
-    /**
-     * setze Lautstärke auf
-     * @param volume number
-     */
-    setVolume(volume) {
-        this.notSupported("Musik.setzeLautstärkeAuf", volume);
-    }
+  /**
+   * setze Lautstärke auf
+   * @param {number} volume
+   */
+  setVolume(volume) {
+    this.notSupported("Musik.setzeLautstärkeAuf", volume);
+  }
 
-    /**
-     * alle Soundeffekte anhalten
-     */
-    stopAllSounds() {
-        this.notSupported("Musik.alleSoundeffekteAnhalten");
-    }
+  /**
+   * alle Soundeffekte anhalten
+   */
+  stopAllSounds() {
+    this.notSupported("Musik.alleSoundeffekteAnhalten");
+  }
 
-    /**
-     * ändere das Tempo um
-     * @param bpm number
-     */
-    changeTempoBy(bpm) {
-        this.notSupported("Musik.ändereDasTempoUm", bpm);
-    }
+  /**
+   * ändere das Tempo um
+   * @param {number} bpm
+   */
+  changeTempoBy(bpm) {
+    this.notSupported("Musik.ändereDasTempoUm", bpm);
+  }
 
-    /**
-     * ändere das Tempo auf
-     * @param bpm number
-     */
-    setTempo(bpm) {
-        this.notSupported("Musik.ändereDasTempoAuf", bpm);
-    }
+  /**
+   * ändere das Tempo auf
+   * @param {number} bpm
+   */
+  setTempo(bpm) {
+    this.notSupported("Musik.ändereDasTempoAuf", bpm);
+  }
 
-    /**
-     * Schlag
-     * @param fraction BeatFraction
-     */
-    beat(fraction) {
-        this.notSupported("Musik.schlag", fraction);
-    }
+  /**
+   * Schlag
+   * @param {BeatFraction} fraction
+   */
+  beat(fraction) {
+    this.notSupported("Musik.schlag", fraction.toString());
+  }
 
-    /**
-     * Tempo (bpm)
-     */
-    tempo() {
-        this.notSupported("Musik.tempo");
-    }
+  /**
+   * Tempo (bpm)
+   */
+  tempo() {
+    this.notSupported("Musik.tempo");
+  }
 
-    /**
-     * beginne Melodie und wiederhole
-     * @param melodyArray buildInMelody
-     * @param options MelodyOptions
-     */
-    startMelody(melodyArray, options) {
-        this.notSupported("Musik.beginneMelodie", melodyArray, options);
-    }
+  /**
+   * beginne Melodie und wiederhole
+   * @param {String[]} melodyArray buildInMelody
+   * @param {MelodyOptions} options
+   */
+  startMelody(melodyArray, options) {
+    this.notSupported(
+      "Musik.beginneMelodie",
+      melodyArray.toString(),
+      options.toString()
+    );
+  }
 
-    /**
-     * halte Melodie an
-     * @param options MelodyStopOptions
-     */
-    stopMelody(options) {
-        this.notSupported("Musik.halteMelodieAn", options);
-    }
-
-    /**
-     *
-     * @param melody Melodies
-     */
-    builtInMelody(melody) {
-        return [melody.toString()];
-    }
+  /**
+   * halte Melodie an
+   * @param {MelodyStopOptions} options
+   */
+  stopMelody(options) {
+    this.notSupported("Musik.halteMelodieAn", options.toString());
+  }
 }

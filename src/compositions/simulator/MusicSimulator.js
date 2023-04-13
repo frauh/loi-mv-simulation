@@ -1,4 +1,3 @@
-import Simulator from "@/compositions/simulator/Simulator";
+import MusicMapper from "@/compositions/makeCodeMapper/MusicMapper";
 
-export default class MusicSimulator extends Simulator {
-}
+export default class MusicSimulator extends MusicMapper {}

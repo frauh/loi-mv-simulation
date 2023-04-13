@@ -1,84 +1,95 @@
-import Mapper from "@/compositions/makeCodeMapper/Mapper";
+import Simulator from "@/compositions/makeCodeMapper/Simulator";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'NeopixelMapper' für micro:bit V1
  * vgl. https://github.com/microsoft/pxt-neopixel/blob/master/neopixel.ts
  */
-export default class NeopixelMapper extends Mapper {
+export default class NeopixelMapper extends Simulator {
   /**
    * setze Strip auf
-   * @param pin DigitalPin
-   * @param numLeds number
-   * @param mode NeoPixelMode
+   * @param {DigitalPin} pin
+   * @param {number} numLeds
+   * @param {NeoPixelMode} mode
+   * @return {StripMapper}
    */
   create(pin, numLeds, mode) {
-    this.unused("Neopixel.setzeStrip", pin, numLeds, mode);
-    return new Strip(this._simulator);
+    this.notSupported(
+      "Neopixel.setzeStrip",
+      pin.toString(),
+      numLeds,
+      mode.toString()
+    );
+    return null;
   }
 
   /**
    * HSL-Farbe: Farbwert, Sättigung, Helligkeit
-   * @param h
-   * @param s
-   * @param l
+   * @param {number} h
+   * @param {number} s
+   * @param {number} l
+   * @return {number}
    */
   hsl(h, s, l) {
-    return "hsl(".concat(h, ",", s, "%,", l, "%)");
+    this.notSupported("Neopixel.hsl-farbe", h, s, l);
+    return 0;
   }
 
   /**
    * Farbe
-   * @param color NeoPixelColors
+   * @param {NeoPixelColors} color
+   * @return {number}
    */
   colors(color) {
-    return color;
+    this.notSupported("Neopixel.Farbe", color.toString());
+    return 0;
   }
 
   /**
    * rot grün blau
-   * @param red number
-   * @param green number
-   * @param blue number
+   * @param {number} red
+   * @param {number} green
+   * @param {number} blue
+   * @return {number}
    */
   rgb(red, green, blue) {
-    return "rgb(".concat(red, ",", green, ",", blue, ")");
+    this.notSupported("Neopixel.hsl-farbe", red, green, blue);
+    return 0;
   }
 }
 
-class Strip extends Mapper {
+export class StripMapper extends Simulator {
   /**
    * setze range auf strip
-   * @param start number
-   * @param length number
+   * @param {number} start
+   * @param {number} length
+   * @return StripMapper
    */
   range(start, length) {
-    this.unused("Neopixel.setzeRangeAuf", start, length);
-    // nothing to do
-    return "";
+    this.notSupported("Neopixel.setzeRangeAuf", start, length);
+    return null;
   }
 
   /**
    * zeige Regenbogenfarben von Farbton bis
-   * @param startHue number
-   * @param endHue number
+   * @param {number} startHue
+   * @param {number} endHue
    */
   showRainbow(startHue, endHue) {
-    this.unused("Neopixel.zeigeRegenbogenfarben", startHue, endHue);
-    this._simulator.turnOn("rainbow");
+    this.notSupported("Neopixel.zeigeRegenbogenfarben", startHue, endHue);
   }
 
   /**
    * zeige Farbe
-   * @param rgb number
+   * @param {number} rgb
    */
   showColor(rgb) {
-    this._simulator.turnOn(rgb);
+    this.notSupported("Neopixel.zeigeFarbe", rgb);
   }
 
   /**
    * zeige Balkendiagramm von Wert mit Maximum
-   * @param value
-   * @param high
+   * @param {number} value
+   * @param {number} high
    */
   showBarGraph(value, high) {
     this.notSupported("Neopixel.zeigeBalkendiagramm", value, high);
@@ -95,7 +106,7 @@ class Strip extends Mapper {
    * strip ausschalten
    */
   clear() {
-    this._simulator.turnOff();
+    this.notSupported("Neopixel.ausschalten");
   }
 
   /**
@@ -108,7 +119,7 @@ class Strip extends Mapper {
 
   /**
    * rotiere NeoPixel um
-   * @param offset
+   * @param {number} offset
    */
   rotate(offset) {
     this.notSupported("Neopixel.rotiereNeopixel", offset);
@@ -116,8 +127,8 @@ class Strip extends Mapper {
 
   /**
    * setze weiße LED von NeoPixel
-   * @param pixelOffset number
-   * @param white number
+   * @param {number} pixelOffset
+   * @param {number} white
    */
   setPixelWhiteLED(pixelOffset, white) {
     this.notSupported("Neopixel.setzeWeißeLedVonNeopixel", pixelOffset, white);
@@ -163,7 +174,7 @@ class Strip extends Mapper {
 
   /**
    * setze Matrix Breite
-   * @param width number
+   * @param {number} width
    */
   setMatrixWidth(width) {
     this.notSupported("Neopixel.setzeMatrixBreite", width);
@@ -171,9 +182,9 @@ class Strip extends Mapper {
 
   /**
    * setze Matrix Farbe an Position auf
-   * @param x number
-   * @param y number
-   * @param rgb number
+   * @param {number} x
+   * @param {number} y
+   * @param {number} rgb
    */
   setMatrixColor(x, y, rgb) {
     this.notSupported("Neopixel.setzeMatrixFarbeAnPosition", x, y, rgb);

@@ -27,7 +27,7 @@
       :is-enabled="erasingEnabled || drawingEnabled"
       description="Untergrund bearbeiten"
       icon="fas fa-image"
-      @toggle="callModalUnderground"
+      @toggle="callEditBackground"
     />
     <ControlButton
       color="black"
@@ -168,7 +168,7 @@ export default {
     "removeBackgroundImage",
   ],
   methods: {
-    callModalUnderground() {
+    callEditBackground() {
       this.$emit("stopSimulation");
       if (this.drawingEnabled || this.erasingEnabled) {
         this.$emit("stopManipulatingBackground");

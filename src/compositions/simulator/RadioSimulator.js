@@ -1,4 +1,3 @@
-import Simulator from "@/compositions/simulator/Simulator";
+import RadioMapper from "@/compositions/makeCodeMapper/RadioMapper";
 
-export default class RadioSimulator extends Simulator {
-}
+export default class RadioSimulator extends RadioMapper {}

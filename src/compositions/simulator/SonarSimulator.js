@@ -1,4 +1,3 @@
-import Simulator from "@/compositions/simulator/Simulator";
+import SonarMapper from "@/compositions/makeCodeMapper/SonarMapper";
 
-export default class SonarSimulator extends Simulator {
-}
+export default class SonarSimulator extends SonarMapper {}

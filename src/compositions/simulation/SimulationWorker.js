@@ -1,30 +1,20 @@
 /* eslint-disable no-unused-vars */
 // noinspection JSUnusedGlobalSymbols
 
-import BasicMapper from "@/compositions/makeCodeMapper/BasicMapper";
 import BasicSimulator from "@/compositions/simulator/BasicSimulator";
-import InputMapper from "@/compositions/makeCodeMapper/InputMapper";
 import InputSimulator from "@/compositions/simulator/InputSimulator";
-import MusicMapper from "@/compositions/makeCodeMapper/MusicMapper";
 import MusicSimulator from "@/compositions/simulator/MusicSimulator";
-import LedMapper from "@/compositions/makeCodeMapper/LedMapper";
 import LedSimulator from "@/compositions/simulator/LedSimulator";
-import RadioMapper from "@/compositions/makeCodeMapper/RadioMapper";
 import RadioSimulator from "@/compositions/simulator/RadioSimulator";
-import LoopsMapper from "@/compositions/makeCodeMapper/LoopsMapper";
 import LoopsSimulator from "@/compositions/simulator/LoopsSimulator";
-import LoiMvMapper from "@/compositions/makeCodeMapper/LoiMvMapper";
 import LoiMvSimulator from "@/compositions/simulator/LoiMvSimulator";
-import I2cLcdMapper from "@/compositions/makeCodeMapper/I2cLcdMapper";
 import I2cLcdSimulator from "@/compositions/simulator/I2cLcdSimulator";
-import NeopixelMapper from "@/compositions/makeCodeMapper/NeopixelMapper";
 import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
-import SonarMapper from "@/compositions/makeCodeMapper/SonarMapper";
 import SonarSimulator from "@/compositions/simulator/SonarSimulator";
 
 /**
  *
- * Lade Mapper, um alle potenziellen Befehle aus MakeCode damit abfangen zu können.
+ * Lade Simulator, um alle potenziellen Befehle aus MakeCode damit abfangen zu können.
  * Die Konstanten müssen so benannt sein, dass sie dem Präfix aus MakeCode entsprechen.
  * Führe anschließend den Code aus. --> Achtung: Sicherheitsrisiko
  *
@@ -45,23 +35,18 @@ self.onmessage = async ({
     startTime,
     pose,
     backgroundImageData,
-    backgroundWidth,
   },
 }) => {
-  const basic = new BasicMapper(new BasicSimulator(vehicleColor, vehicleLabel));
-  const input = new InputMapper(new InputSimulator(startTime, pose));
-  const music = new MusicMapper(new MusicSimulator());
-  const led = new LedMapper(new LedSimulator());
-  const radio = new RadioMapper(new RadioSimulator());
-  const loops = new LoopsMapper(new LoopsSimulator());
-  const LOI_MV = new LoiMvMapper(
-    new LoiMvSimulator(pose, backgroundImageData, backgroundWidth)
-  );
-  const I2C_LCD1602 = new I2cLcdMapper(
-    new I2cLcdSimulator(vehicleColor, vehicleLabel)
-  );
-  const neopixel = new NeopixelMapper(new NeopixelSimulator());
-  const sonar = new SonarMapper(new SonarSimulator());
+  const basic = new BasicSimulator(vehicleColor, vehicleLabel);
+  const input = new InputSimulator(startTime, pose);
+  const music = new MusicSimulator();
+  const led = new LedSimulator();
+  const radio = new RadioSimulator();
+  const loops = new LoopsSimulator();
+  const LOI_MV = new LoiMvSimulator(pose, backgroundImageData);
+  const I2C_LCD1602 = new I2cLcdSimulator(vehicleColor, vehicleLabel);
+  const neopixel = new NeopixelSimulator();
+  const sonar = new SonarSimulator();
 
   eval(code);
 };

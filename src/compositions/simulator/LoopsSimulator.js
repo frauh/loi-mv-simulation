@@ -1,4 +1,3 @@
-import Simulator from "@/compositions/simulator/Simulator";
+import LoopsMapper from "@/compositions/makeCodeMapper/LoopsMapper";
 
-export default class LoopsSimulator extends Simulator {
-}
+export default class LoopsSimulator extends LoopsMapper {}

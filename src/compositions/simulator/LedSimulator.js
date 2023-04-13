@@ -1,4 +1,3 @@
-import Simulator from "@/compositions/simulator/Simulator";
+import LedMapper from "@/compositions/makeCodeMapper/LedMapper";
 
-export default class LedSimulator extends Simulator {
-}
+export default class LedSimulator extends LedMapper {}

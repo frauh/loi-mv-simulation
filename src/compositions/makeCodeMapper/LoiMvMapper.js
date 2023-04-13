@@ -1,45 +1,56 @@
-import Mapper from "@/compositions/makeCodeMapper/Mapper";
+import Simulator from "@/compositions/makeCodeMapper/Simulator";
 
 /**
  * Alle MakeCode Funktionen aus dem Reiter 'LOI_MV' für micro:bit V1
  * vgl. https://github.com/eschaetz/loi-mv-sek1
  */
-export default class LoiMvMapper extends Mapper {
+export default class LoiMvMapper extends Simulator {
   /**
    *
-   * @param kompass Boolean
+   * @param {boolean} kompass
    */
   init(kompass) {
-    this.unused("LOI_MV.init", kompass);
-    // nothing to do
+    this.notSupported("LOI_MV.init", kompass.toString());
   }
 
   /**
    *
-   * @param drehung Number
-   * @param tolleranz Number
+   * @param {number} drehung
+   * @param {number} toleranz
    */
-  graddrehung(drehung, tolleranz) {
-    this.unused("LOI_MV.graddrehung", tolleranz);
-    this._simulator.simulateRotation(drehung);
-  }
-
-  helligkeitLinks() {
-    this._simulator.simulateBrightnessLeft();
-  }
-
-  helligkeitRechts() {
-    this._simulator.simulateBrightnessRight();
+  graddrehung(drehung, toleranz) {
+    this.notSupported("LOI_MV.graddrehung", toleranz);
   }
 
   /**
    *
-   * @param power Number (-10...10)
-   * @param lenkung Number (-10...10)
+   * @return {0|1}
+   */
+  helligkeitLinks() {
+    this.notSupported("LOI_MV.helligkeitLinks");
+    return 0;
+  }
+
+  /**
+   *
+   * @return {0|1}
+   */
+  helligkeitRechts() {
+    this.notSupported("LOI_MV.helligkeitRechts");
+    return 0;
+  }
+
+  /**
+   *
+   * @param {number} power (-10...10)
+   * @param {number} lenkung (-10...10)
    */
   antrieb(power, lenkung) {
-    this._simulator.simulateMotors(power, lenkung);
+    this.notSupported("LOI_MV.antrieb", power, lenkung);
   }
 
-  ultraschall() {}
+  ultraschall() {
+    this.notSupported("LOI_MV.ultraschall");
+    return 0;
+  }
 }
