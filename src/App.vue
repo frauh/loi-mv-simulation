@@ -349,28 +349,47 @@ export default {
       this.$refs.simulationArea.stopManipulatingBackground();
     },
     uploadBackgroundImage(file) {
+      this.removeBackgroundImage();
       const URL = window.webkitURL || window.URL;
       let image = new Image();
       image.src = URL.createObjectURL(file);
       image.onload = () => {
-        const konvaImage = new Konva.Image({
-          image: image,
-          x: 0,
-          y: 0,
-          width: this.backgroundLayer.width(),
-          height: this.backgroundLayer.height(),
-          rotation: image.width > image.height ? 0 : 90,
-          listening: false,
-        });
+        let konvaImage = null;
+        if (image.width > image.height) {
+          konvaImage = new Konva.Image({
+            image: image,
+            x: 0,
+            y: 0,
+            width: this.backgroundLayer.width(),
+            height: this.backgroundLayer.height(),
+            listening: false,
+          });
+        } else {
+          konvaImage = new Konva.Image({
+            image: image,
+            x: this.backgroundLayer.width() / 2,
+            y: this.backgroundLayer.height() / 2,
+            width: this.backgroundLayer.height(),
+            height: this.backgroundLayer.width(),
+            rotation: 90,
+            offsetX: this.backgroundLayer.height() / 2,
+            offsetY: this.backgroundLayer.width() / 2,
+            listening: false,
+          });
+        }
+
         this.backgroundLayer.add(konvaImage);
         konvaImage.moveToBottom();
         konvaImage.moveUp();
       };
     },
     removeBackgroundImage() {
-      this.backgroundLayer
-        .getChildren((node) => node.getClassName() === "Image")[0]
-        .destroy();
+      let image = this.backgroundLayer.getChildren(
+        (node) => node.getClassName() === "Image"
+      )[0];
+      if (image) {
+        image.destroy();
+      }
     },
     downloadBackground() {
       this.downloadURI(
