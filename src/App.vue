@@ -3,17 +3,21 @@
     <div class="col-left">
       <SimulationArea
         ref="simulationArea"
-        :background-layer="backgroundLayer"
         :vehicle-layer="vehicleLayer"
         :vehicle-models="vehicleModels"
         :vehicle-traces="vehicleTraces"
+        :background-layer="backgroundLayer"
+        :obstacle-layer="obstacleLayer"
         title="Simulation"
+        @stopSimulation="stopSimulation"
+        @stopRemovingObstacles="stopRemovingObstacles"
       />
     </div>
     <div class="col-middle">
       <ButtonBar
         :drawing-enabled="drawingEnabled"
         :erasing-enabled="erasingEnabled"
+        :removing-obstacles="removingObstacles"
         :is-running="simulation.isRunning"
         @downloadBackground="downloadBackground"
         @drawLine="drawBackground"
@@ -25,6 +29,9 @@
         @stopManipulatingBackground="stopManipulatingBackground"
         @stopSimulation="stopSimulation"
         @uploadBackgroundImage="uploadBackgroundImage"
+        @addObstacle="addObstacle"
+        @removeObstacle="removeObstacle"
+        @stopRemovingObstacles="stopRemovingObstacles"
       />
     </div>
     <div class="col-right">
@@ -72,6 +79,8 @@ export default {
       backgroundLayer: new Konva.Layer(),
       drawingEnabled: false,
       erasingEnabled: false,
+      obstacleLayer: new Konva.Layer(),
+      removingObstacles: false,
       animation: null,
     };
   },
@@ -207,7 +216,7 @@ export default {
     stopManipulatingBackground() {
       this.drawingEnabled = false;
       this.erasingEnabled = false;
-      this.$refs.simulationArea.stopManipulatingBackground();
+      this.$refs.simulationArea.stopManipulating();
     },
     uploadBackgroundImage(file) {
       this.removeBackgroundImage();
@@ -215,7 +224,7 @@ export default {
       let image = new Image();
       image.src = URL.createObjectURL(file);
       image.onload = () => {
-        let konvaImage = null;
+        let konvaImage;
         if (image.width > image.height) {
           konvaImage = new Konva.Image({
             image: image,
@@ -264,6 +273,17 @@ export default {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    },
+    addObstacle(shape) {
+      this.$refs.simulationArea.addObstacle(shape);
+    },
+    removeObstacle() {
+      this.removingObstacles = !this.removingObstacles;
+      this.$refs.simulationArea.removeObstacle();
+    },
+    stopRemovingObstacles() {
+      this.removingObstacles = false;
+      this.$refs.simulationArea.stopManipulating();
     },
   },
 };

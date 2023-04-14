@@ -144,6 +144,18 @@ export const neoPixelConst = {
 };
 
 /**
+ * zufällige Position in Abhängigkeit von der Größe des Simulationsbereichs
+ * @return {{x: number, y: number}}
+ */
+export function randomPosition() {
+  const stageHeight = stageWidth / ratioConst.background;
+  return {
+    x: stageWidth / 5 + (Math.random() * 3 * stageWidth) / 5,
+    y: stageHeight / 5 + (Math.random() * 3 * stageHeight) / 5,
+  };
+}
+
+/**
  * Winkelumrechnung
  * @param degree Grad
  * @return {number} Radiant

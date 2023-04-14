@@ -1,11 +1,6 @@
 <template>
   <div class="area">
-    <div
-      id="container"
-      ref="container"
-      :style="{ aspectRatio: ratioConst.background }"
-      class="container"
-    ></div>
+    <div id="container" ref="container" class="container"></div>
     <h3 class="heading-left">{{ title }}</h3>
   </div>
 </template>
@@ -14,6 +9,7 @@
 import Konva from "konva";
 import {
   neoPixelConst,
+  randomPosition,
   ratioConst,
   setStageWidth,
   toMeter,
@@ -23,24 +19,24 @@ import {
 
 export default {
   name: "SimulationArea",
-  computed: {
-    ratioConst() {
-      return ratioConst;
-    },
-  },
   props: {
     title: String,
     vehicleLayer: Konva.Layer,
-    backgroundLayer: Konva.Layer,
     vehicleModels: Map,
     vehicleTraces: Map,
+    backgroundLayer: Konva.Layer,
+    obstacleLayer: Konva.Layer,
   },
+  emits: ["stopSimulation", "stopRemovingObstacles"],
   data() {
     return {
       stage: Konva.Stage,
-      isDrawing: false,
       width: Number,
       height: Number,
+      aspectRatio: ratioConst.background,
+      cursorSize: 24,
+      isDrawing: false,
+      isRemoving: false,
     };
   },
   mounted() {
@@ -51,7 +47,7 @@ export default {
       width: this.width,
       height: this.height,
     });
-    this.stage.add(this.backgroundLayer, this.vehicleLayer);
+    this.stage.add(this.backgroundLayer, this.obstacleLayer, this.vehicleLayer);
     let background = new Konva.Rect({
       x: 0,
       y: 0,
@@ -133,32 +129,7 @@ export default {
         this.vehicleLayer.add(transformer);
 
         // Eventhandling insbes. fürs Transformieren
-        let mouseOver = false;
-        model.on("mouseenter", () => {
-          if (!this.drawingEnabled && !this.drawingEnabled) {
-            document.body.style.cursor = "grab";
-            transformer.borderEnabled(true);
-            transformer.anchorSize(10);
-            mouseOver = true;
-          }
-        });
-        model.on("mousedown", () => {
-          this.$emit("stopSimulation");
-          document.body.style.cursor = "grabbing";
-        });
-        model.on("mouseup", () => (document.body.style.cursor = "grab"));
-        model.on("mouseout", () => {
-          document.body.style.cursor = "default";
-          mouseOver = false;
-          setTimeout(() => {
-            if (!transformer.isTransforming()) {
-              if (!mouseOver) {
-                transformer.borderEnabled(false);
-                transformer.anchorSize(0);
-              }
-            }
-          }, 2000);
-        });
+        this.addMouseEventsTo(model, transformer);
         model.on("dragend", () => {
           vehicle.pose = {
             x: toMeter(model.x()),
@@ -166,24 +137,16 @@ export default {
             theta: model.rotation(),
           };
         });
-        model.on("transformstart", () => this.$emit("stopSimulation"));
         model.on("transformend", () => {
           vehicle.pose = {
             x: toMeter(model.x()),
             y: toMeter(model.y()),
             theta: (model.rotation() + 360) % 360,
           };
-          setTimeout(() => {
-            if (!mouseOver) {
-              transformer.borderEnabled(false);
-              transformer.anchorSize(0);
-            }
-          }, 2000);
         });
       };
     },
     manipulateBackground(draw, size) {
-      let cursorSize = 24;
       let lastLine;
       this.stage.on("mousedown touchstart", () => {
         this.isDrawing = true;
@@ -210,27 +173,152 @@ export default {
           lastLine.points(lastLine.points().concat([position.x, position.y]));
         }
       });
-
-      // Font Awesome Cursor Icon
-      const canvas = document.createElement("canvas");
-      canvas.width = cursorSize;
-      canvas.height = cursorSize;
-      const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "steelblue";
-      ctx.font = cursorSize.toString().concat("px FontAwesome");
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.translate(cursorSize, 0);
-      ctx.rotate(Math.PI / 2);
-      ctx.fillText(draw ? "\uf304" : "\uf12d", cursorSize / 2, cursorSize / 2);
-      const dataURL = canvas.toDataURL("image/png");
-      this.$refs.container.style.cursor = "url(" + dataURL + "), auto";
+      this.useFontAwesomeCursor(draw ? "\uf304" : "\uf12d", true);
     },
-    stopManipulatingBackground() {
+    stopManipulating() {
       this.stage.off(
         "mousedown touchstart mouseup touchend mousemove touchmove mouseover mouseout"
       );
       this.$refs.container.style.cursor = "";
+    },
+    addObstacle(shape) {
+      let obstacle;
+      const size = 70;
+      switch (shape) {
+        case "circle":
+          obstacle = new Konva.Circle({
+            radius: size,
+            fillLinearGradientStartPoint: { x: -size, y: -size },
+            fillLinearGradientEndPoint: { x: size, y: size },
+          });
+          break;
+        case "rectangle":
+          obstacle = new Konva.Rect({
+            width: size * 2,
+            height: size * 2,
+            fillLinearGradientStartPoint: { x: 0, y: 0 },
+            fillLinearGradientEndPoint: { x: size * 2, y: size * 2 },
+          });
+          break;
+        default:
+          return;
+      }
+      obstacle.setAttrs({
+        x: randomPosition().x,
+        y: randomPosition().y,
+        stroke: "black",
+        strokeWidth: 3,
+        strokeScaleEnabled: false,
+        fillLinearGradientColorStops: this.calculateObstacleFilling(size),
+        draggable: true,
+      });
+      this.obstacleLayer.add(obstacle);
+
+      let transformer = new Konva.Transformer({
+        nodes: [obstacle],
+        rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
+        keepRatio: false,
+        borderEnabled: false,
+        anchorSize: 0,
+        borderStroke: "lightsteelblue",
+        anchorStroke: "lightsteelblue",
+        anchorFill: "lightsteelblue",
+        borderStrokeWidth: 2,
+      });
+      this.obstacleLayer.add(transformer);
+
+      this.addMouseEventsTo(obstacle, transformer);
+      obstacle.on("mousedown", () => {
+        if (this.isRemoving) {
+          obstacle.destroy();
+          transformer.destroy();
+          this.$emit("stopRemovingObstacles");
+        }
+      });
+      obstacle.on("transformend", () =>
+        obstacle.setAttr(
+          //TODO
+          "fillLinearGradientColorStops",
+          this.calculateObstacleFilling(obstacle.width() * obstacle.scaleX)
+        )
+      );
+    },
+    calculateObstacleFilling(radius) {
+      let result = [];
+      let step = 1 / radius;
+      for (let i = 0; i < radius; i += 10) {
+        result.push(
+          i * step,
+          "black",
+          (i + 4) * step,
+          "black",
+          (i + 5) * step,
+          "yellow",
+          (i + 9) * step,
+          "yellow"
+        );
+      }
+      result.push(1, "black");
+      return result;
+    },
+    removeObstacle() {
+      //TODO
+      this.isRemoving = true;
+      this.useFontAwesomeCursor("\uf05e");
+    },
+    addMouseEventsTo(konvaObject, transformer) {
+      let mouseOver = false;
+      konvaObject.on("mouseenter", () => {
+        if (!this.drawingEnabled && !this.drawingEnabled) {
+          document.body.style.cursor = "grab";
+          transformer.borderEnabled(true);
+          transformer.anchorSize(10);
+          mouseOver = true;
+        }
+      });
+      konvaObject.on("mousedown", () => {
+        this.$emit("stopSimulation");
+        document.body.style.cursor = "grabbing";
+      });
+      konvaObject.on("mouseup", () => (document.body.style.cursor = "grab"));
+      konvaObject.on("mouseout", () => {
+        document.body.style.cursor = "default";
+        mouseOver = false;
+        setTimeout(() => {
+          if (!transformer.isTransforming()) {
+            if (!mouseOver) {
+              transformer.borderEnabled(false);
+              transformer.anchorSize(0);
+            }
+          }
+        }, 2000);
+      });
+      konvaObject.on("transformstart", () => this.$emit("stopSimulation"));
+      konvaObject.on("transformend", () => {
+        setTimeout(() => {
+          if (!mouseOver) {
+            transformer.borderEnabled(false);
+            transformer.anchorSize(0);
+          }
+        }, 2000);
+      });
+    },
+    useFontAwesomeCursor(icon, rotate = false) {
+      const canvas = document.createElement("canvas");
+      canvas.width = this.cursorSize;
+      canvas.height = this.cursorSize;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "steelblue";
+      ctx.font = this.cursorSize.toString().concat("px FontAwesome");
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      if (rotate) {
+        ctx.translate(this.cursorSize, 0);
+        ctx.rotate(Math.PI / 2);
+      }
+      ctx.fillText(icon, this.cursorSize / 2, this.cursorSize / 2);
+      const dataURL = canvas.toDataURL("image/png");
+      this.$refs.container.style.cursor = "url(" + dataURL + "), auto";
     },
   },
 };
@@ -257,5 +345,6 @@ export default {
 .container {
   width: 100%;
   height: 100%;
+  aspect-ratio: v-bind("aspectRatio");
 }
 </style>

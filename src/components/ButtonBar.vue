@@ -29,10 +29,11 @@
       icon="fas fa-image"
       @toggle="callEditBackground"
     />
-    <ControlButton
-      color="black"
+    <ToggleButton
+      :is-enabled="removingObstacles"
       description="Hindernis hinzufügen"
       icon="fas fa-car-burst"
+      @toggle="callEditObstacles"
     />
   </div>
   <VueModal v-model="showBackgroundModal" title="Untergrund bearbeiten">
@@ -132,6 +133,39 @@
       </div>
     </div>
   </VueModal>
+  <VueModal v-model="showObstacleModal" title="Hindernisse bearbeiten">
+    <div class="modal-column">
+      <div class="modal-row">
+        <ControlButton
+          color="black"
+          description="rundes Hindernis hinzufügen"
+          icon="fas fa-circle-plus"
+          @btn-click="
+            $emit('addObstacle', 'circle');
+            showObstacleModal = false;
+          "
+        />
+        <ControlButton
+          color="black"
+          description="viereckiges Hindernis hinzufügen"
+          icon="fas fa-square-plus"
+          @btn-click="
+            $emit('addObstacle', 'rectangle');
+            showObstacleModal = false;
+          "
+        />
+        <ControlButton
+          color="black"
+          description="Hindernis entfernen"
+          icon="fas fa-ban"
+          @btn-click="
+            $emit('removeObstacle');
+            showObstacleModal = false;
+          "
+        />
+      </div>
+    </div>
+  </VueModal>
 </template>
 
 <script>
@@ -146,6 +180,7 @@ export default {
     isRunning: Boolean,
     drawingEnabled: Boolean,
     erasingEnabled: Boolean,
+    removingObstacles: Boolean,
   },
   data() {
     return {
@@ -153,6 +188,7 @@ export default {
       backgroundFileName: "",
       drawSize: 20,
       eraseSize: 40,
+      showObstacleModal: false,
     };
   },
   emits: [
@@ -166,10 +202,16 @@ export default {
     "downloadBackground",
     "uploadBackgroundImage",
     "removeBackgroundImage",
+    "stopRemovingObstacles",
+    "addObstacle",
+    "removeObstacle",
   ],
   methods: {
     callEditBackground() {
       this.$emit("stopSimulation");
+      if (this.removingObstacles) {
+        this.$emit("stopRemovingObstacles");
+      }
       if (this.drawingEnabled || this.erasingEnabled) {
         this.$emit("stopManipulatingBackground");
       } else {
@@ -184,6 +226,17 @@ export default {
       this.$emit("uploadBackgroundImage", this.$refs.fileInput.files[0]);
       this.$refs.fileInput.value = "";
       this.showBackgroundModal = false;
+    },
+    callEditObstacles() {
+      this.$emit("stopSimulation");
+      if (this.drawingEnabled || this.erasingEnabled) {
+        this.$emit("stopManipulatingBackground");
+      }
+      if (this.removingObstacles) {
+        this.$emit("stopRemovingObstacles");
+      } else {
+        this.showObstacleModal = true;
+      }
     },
   },
 };
@@ -215,8 +268,6 @@ export default {
 
 .modal-row > button {
   width: 4vw;
-  margin-left: 0;
-  margin-right: 5px;
 }
 
 .modal-row > label {
