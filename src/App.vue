@@ -8,6 +8,7 @@
         :vehicle-traces="vehicleTraces"
         :background-layer="backgroundLayer"
         :obstacle-layer="obstacleLayer"
+        :removing-obstacles="removingObstacles"
         title="Simulation"
         @stopSimulation="stopSimulation"
         @stopRemovingObstacles="stopRemovingObstacles"
@@ -278,7 +279,7 @@ export default {
       this.$refs.simulationArea.addObstacle(shape);
     },
     removeObstacle() {
-      this.removingObstacles = !this.removingObstacles;
+      this.removingObstacles = true;
       this.$refs.simulationArea.removeObstacle();
     },
     stopRemovingObstacles() {

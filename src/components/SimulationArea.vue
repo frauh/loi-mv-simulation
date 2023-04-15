@@ -26,6 +26,7 @@ export default {
     vehicleTraces: Map,
     backgroundLayer: Konva.Layer,
     obstacleLayer: Konva.Layer,
+    removingObstacles: Boolean,
   },
   emits: ["stopSimulation", "stopRemovingObstacles"],
   data() {
@@ -36,7 +37,6 @@ export default {
       aspectRatio: ratioConst.background,
       cursorSize: 24,
       isDrawing: false,
-      isRemoving: false,
     };
   },
   mounted() {
@@ -229,47 +229,43 @@ export default {
 
       this.addMouseEventsTo(obstacle, transformer);
       obstacle.on("mousedown", () => {
-        if (this.isRemoving) {
+        if (this.removingObstacles) {
+          this.$emit("stopRemovingObstacles");
           obstacle.destroy();
           transformer.destroy();
-          this.$emit("stopRemovingObstacles");
         }
       });
       obstacle.on("transformend", () =>
         obstacle.setAttr(
-          //TODO
           "fillLinearGradientColorStops",
-          this.calculateObstacleFilling(obstacle.width() * obstacle.scaleX)
+          this.calculateObstacleFilling(obstacle.width() * obstacle.scale().x)
         )
       );
     },
-    calculateObstacleFilling(radius) {
+    calculateObstacleFilling(width) {
       let result = [];
-      let step = 1 / radius;
-      for (let i = 0; i < radius; i += 10) {
-        result.push(
-          i * step,
-          "black",
-          (i + 4) * step,
-          "black",
-          (i + 5) * step,
-          "yellow",
-          (i + 9) * step,
-          "yellow"
-        );
+      let step = 1 / width;
+      let thickness = Math.floor(width / 10);
+      for (let i = 0; i < width; i++) {
+        if (i % (2 * thickness) < thickness) {
+          result.push(i * step, "yellow");
+        } else {
+          result.push(i * step, "black");
+        }
       }
-      result.push(1, "black");
       return result;
     },
     removeObstacle() {
-      //TODO
-      this.isRemoving = true;
       this.useFontAwesomeCursor("\uf05e");
     },
     addMouseEventsTo(konvaObject, transformer) {
       let mouseOver = false;
       konvaObject.on("mouseenter", () => {
-        if (!this.drawingEnabled && !this.drawingEnabled) {
+        if (
+          !this.drawingEnabled &&
+          !this.drawingEnabled &&
+          !this.removingObstacles
+        ) {
           document.body.style.cursor = "grab";
           transformer.borderEnabled(true);
           transformer.anchorSize(10);
@@ -278,7 +274,13 @@ export default {
       });
       konvaObject.on("mousedown", () => {
         this.$emit("stopSimulation");
-        document.body.style.cursor = "grabbing";
+        if (
+          !this.drawingEnabled &&
+          !this.drawingEnabled &&
+          !this.removingObstacles
+        ) {
+          document.body.style.cursor = "grabbing";
+        }
       });
       konvaObject.on("mouseup", () => (document.body.style.cursor = "grab"));
       konvaObject.on("mouseout", () => {
