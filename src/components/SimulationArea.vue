@@ -183,6 +183,7 @@ export default {
     },
     addObstacle(shape) {
       let obstacle;
+      let transformer;
       const size = 70;
       switch (shape) {
         case "circle":
@@ -190,6 +191,14 @@ export default {
             radius: size,
             fillLinearGradientStartPoint: { x: -size, y: -size },
             fillLinearGradientEndPoint: { x: size, y: size },
+          });
+          transformer = new Konva.Transformer({
+            enabledAnchors: [
+              "top-left",
+              "top-right",
+              "bottom-left",
+              "bottom-right",
+            ],
           });
           break;
         case "rectangle":
@@ -199,6 +208,7 @@ export default {
             fillLinearGradientStartPoint: { x: 0, y: 0 },
             fillLinearGradientEndPoint: { x: size * 2, y: size * 2 },
           });
+          transformer = new Konva.Transformer({});
           break;
         default:
           return;
@@ -211,13 +221,17 @@ export default {
         strokeScaleEnabled: false,
         fillLinearGradientColorStops: this.calculateObstacleFilling(size),
         draggable: true,
+        shadowColor: "black",
+        shadowBlur: 5,
+        shadowOffset: { x: 3, y: 3 },
+        shadowOpacity: 0.5,
       });
       this.obstacleLayer.add(obstacle);
 
-      let transformer = new Konva.Transformer({
+      transformer.setAttrs({
         nodes: [obstacle],
+        keepRatio: true,
         rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
-        keepRatio: false,
         borderEnabled: false,
         anchorSize: 0,
         borderStroke: "lightsteelblue",
@@ -236,10 +250,15 @@ export default {
         }
       });
       obstacle.on("transformend", () =>
-        obstacle.setAttr(
-          "fillLinearGradientColorStops",
-          this.calculateObstacleFilling(obstacle.width() * obstacle.scale().x)
-        )
+        obstacle.setAttrs({
+          fillLinearGradientColorStops: this.calculateObstacleFilling(
+            obstacle.width() * obstacle.scale().x
+          ),
+          shadowColor: "black",
+          shadowBlur: 5,
+          shadowOffset: { x: 3, y: 3 },
+          shadowOpacity: 0.5,
+        })
       );
     },
     calculateObstacleFilling(width) {
@@ -288,7 +307,7 @@ export default {
         mouseOver = false;
         setTimeout(() => {
           if (!transformer.isTransforming()) {
-            if (!mouseOver) {
+            if (transformer && !mouseOver) {
               transformer.borderEnabled(false);
               transformer.anchorSize(0);
             }

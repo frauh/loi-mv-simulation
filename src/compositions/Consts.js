@@ -56,6 +56,12 @@ export const vehicleConst = {
   b: 0.143,
 
   /**
+   * Höchstgeschwindigkeit des Roboters
+   * @type {number} Meter/Sekunde
+   */
+  maxSpeed: 0.1,
+
+  /**
    * Abstand des Drehzentrum (Mittelpunkt der Achsen) vom Mittelpunkt des Roboters
    * @type {number} Meter
    */
@@ -98,16 +104,23 @@ export const photocellConst = {
 
 export const sonarConst = {
   /**
-   * Entfernung des Ultraschallsensors vom Mittelpunkt des Roboters
+   * Entfernung des Ultraschallsensors vom Mittelpunkt des Roboters.
+   * Ist nicht gleich der "Stoßstange".
    * @type {number} Meter
    */
-  offset: 0.0935,
+  offset: vehicleConst.width / 2 - 0.02,
 
   /**
    * Winkel, der den Messbereich des Ultraschallsensors aufspannt
    * @type {number} Grad
    */
   measurementAngle: 15,
+
+  /**
+   * Warum auch immer gibt der Sensor weniger cm zurück als er sollte
+   * @type {number} Factor
+   */
+  inaccuracy: 2 / 3,
 };
 
 export const neoPixelConst = {
@@ -179,7 +192,7 @@ export function toDegree(radian) {
  * @return {number} Pixel
  */
 export function toPixel(meter) {
-  return (meter / 1.189) * stageWidth;
+  return (meter / backgroundConst.a0Width) * stageWidth;
 }
 
 /**
@@ -188,5 +201,5 @@ export function toPixel(meter) {
  * @return {number} Meter
  */
 export function toMeter(pixel) {
-  return (pixel * 1.189) / stageWidth;
+  return (pixel * backgroundConst.a0Width) / stageWidth;
 }

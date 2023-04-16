@@ -1,4 +1,5 @@
 import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
+import { stageWidth } from "@/compositions/Consts";
 
 export default class Simulation {
   _workers = [];
@@ -10,7 +11,7 @@ export default class Simulation {
   /**
    * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
    */
-  start(vehicles, backgroundLayerImageData, logArea) {
+  start(vehicles, backgroundLayerImageData, obstacles, logArea) {
     let startTime = Date.now();
 
     vehicles.forEach((vehicle) => {
@@ -26,13 +27,20 @@ export default class Simulation {
         );
         this._workers.push(worker);
         worker.postMessage({
+          stageWidth: stageWidth,
           code: vehicle.program.start, //TODO auch für entrypoints
           vehicleColor: vehicle.color,
           vehicleLabel: vehicle.label,
           startTime: startTime,
-          pose: [vehicle.pose.x, vehicle.pose.y, vehicle.pose.theta],
+          pose: {
+            x: vehicle.pose.x,
+            y: vehicle.pose.y,
+            theta: vehicle.pose.theta,
+          },
           backgroundImageData: backgroundLayerImageData,
+          obstacles: obstacles,
         });
+
         let isCalculating = false;
         let hasAlreadyFinished = false;
         worker.onmessage = ({ data: { key, value } }) => {
@@ -52,7 +60,7 @@ export default class Simulation {
               }
               break;
             case WorkerMessageKey.pose:
-              vehicle.pose = { x: value[0], y: value[1], theta: value[2] };
+              vehicle.pose = value;
               break;
             case WorkerMessageKey.outputLog:
               logArea.output = logArea.output.concat(value);

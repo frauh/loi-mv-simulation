@@ -87,25 +87,22 @@ export default {
   },
   mounted() {
     //TODO for testing
-    let vehicle = new Vehicle("green", "test");
+    let vehicle = new Vehicle("red", "test");
     vehicle.program = parseProgramCode(
-      "LOI_MV.init(false)\n" +
-        "let strip = neopixel.create(DigitalPin.P16, 8, NeoPixelMode.RGB)\n" +
-        "strip.showRainbow(1, 360)\n" +
-        "LOI_MV.antrieb(10, 0)\n" +
-        "basic.pause(2000)\n" +
-        "LOI_MV.antrieb(0, 0)\n"
-      // "LOI_MV.graddrehung(90, 0)\n"
+      // 'basic.showString("links: " + LOI_MV.helligkeitLinks())\n' +
+      //   'basic.showString("rechts: " + LOI_MV.helligkeitRechts())\n'
+      'basic.showString("sonar: " + LOI_MV.ultraschall())\n'
     );
     this.vehicles.set(vehicle.id, vehicle);
     this.$refs.simulationArea.drawVehicleModel(vehicle);
-    let robo = new Vehicle("blue", "robo");
-    robo.program = parseProgramCode(
-      "LOI_MV.antrieb(10, 3)\nbasic.pause(3000)\nLOI_MV.antrieb(0, 0)\n"
-      // "LOI_MV.graddrehung(-90, 0)\n"
-    );
-    this.vehicles.set(robo.id, robo);
-    this.$refs.simulationArea.drawVehicleModel(robo);
+
+    // let robo = new Vehicle("blue", "robo");
+    // robo.program = parseProgramCode(
+    //   // "LOI_MV.antrieb(10, 3)\nbasic.pause(3000)\nLOI_MV.antrieb(0, 0)\n"
+    //   "LOI_MV.graddrehung(-90, 0)\n"
+    // );
+    // this.vehicles.set(robo.id, robo);
+    // this.$refs.simulationArea.drawVehicleModel(robo);
   },
   updated() {
     if (
@@ -134,6 +131,7 @@ export default {
             this.backgroundLayer.width(),
             this.backgroundLayer.height()
           ),
+        this.identifyObstacles(),
         this.$refs.logArea
       );
     },
@@ -285,6 +283,21 @@ export default {
     stopRemovingObstacles() {
       this.removingObstacles = false;
       this.$refs.simulationArea.stopManipulating();
+    },
+    identifyObstacles() {
+      let obstacles = [];
+      this.obstacleLayer
+        .getChildren((child) => child.getClassName() !== "Transformer")
+        .forEach((obstacle) =>
+          obstacles.push({
+            type: obstacle.getClassName(),
+            position: obstacle.position(),
+            width: obstacle.width() * obstacle.scaleX(),
+            height: obstacle.height() * obstacle.scaleY(),
+            rotation: obstacle.rotation(),
+          })
+        );
+      return obstacles;
     },
   },
 };

@@ -3,19 +3,23 @@ import { calculateNewPose } from "@/compositions/simulation/KinematicModel";
 import {
   deltaT,
   photocellConst,
-  stageWidth,
   toPixel,
   toRadian,
+  vehicleConst,
 } from "@/compositions/Consts";
 import LoiMvMapper from "@/compositions/makeCodeMapper/LoiMvMapper";
+import {
+  DigitalPin,
+  PingUnit,
+} from "@/compositions/simulation/SimulationWorker";
 
 export default class LoiMvSimulator extends LoiMvMapper {
-  constructor(pose, backgroundImageData) {
+  constructor(pose, backgroundImageData, sonar) {
     super();
-    // [x, y, theta]
     this._pose = pose;
     this._backgroundImageData = backgroundImageData;
     this._calculationInterval = null;
+    this._sonar = sonar;
   }
 
   /**
@@ -37,19 +41,20 @@ export default class LoiMvSimulator extends LoiMvMapper {
     this.#stopCalculation();
     let motorPower = 8;
     let v = this.#translateToSpeed(motorPower);
-    let target = (this._pose[2] + drehung + 360) % 360;
-    let difference = Math.abs(target - this._pose[2]);
+    toleranz = 4 * v;
+    let target = (this._pose.theta + drehung + 360) % 360;
+    let difference = Math.abs(target - this._pose.theta);
     if (drehung < 0) {
       // Linksdrehung
       this.commit(WorkerMessageKey.intervalCalculating, true);
       this._calculationInterval = setInterval(() => {
         if (Math.min(difference, 360 + difference) > toleranz) {
           this.#singleCalculation(-v, v);
-          difference = Math.abs(target - this._pose[2]);
-          this.commit(WorkerMessageKey.pose, this._pose);
+          difference = Math.abs(target - this._pose.theta);
         } else {
           this.#stopCalculation();
         }
+        console.log(difference);
       }, deltaT * 1000);
     } else {
       // Rechtsdrehung
@@ -57,8 +62,7 @@ export default class LoiMvSimulator extends LoiMvMapper {
       this._calculationInterval = setInterval(() => {
         if (Math.min(difference, 360 - difference) > toleranz) {
           this.#singleCalculation(v, -v);
-          difference = Math.abs(target - this._pose[2]);
-          this.commit(WorkerMessageKey.pose, this._pose);
+          difference = Math.abs(target - this._pose.theta);
         } else {
           this.#stopCalculation();
         }
@@ -71,21 +75,11 @@ export default class LoiMvSimulator extends LoiMvMapper {
    * @return {0|1}
    */
   helligkeitLinks() {
-    const x = Math.floor(
-      toPixel(
-        this._pose.x +
-          Math.cos(toRadian(this._pose.theta - photocellConst.offsetAngle)) *
-            photocellConst.offset
+    return this.#isDarkAtPosition(
+      this.#calculatePhotocellPosition(
+        this._pose.theta - photocellConst.offsetAngle
       )
     );
-    const y = Math.floor(
-      toPixel(
-        this._pose.y +
-          Math.sin(toRadian(this._pose.theta - photocellConst.offsetAngle)) *
-            photocellConst.offset
-      )
-    );
-    return this.#isDarkAtPosition(x, y);
   }
 
   /**
@@ -93,21 +87,11 @@ export default class LoiMvSimulator extends LoiMvMapper {
    * @return {0|1}
    */
   helligkeitRechts() {
-    const x = Math.floor(
-      toPixel(
-        this._pose.x +
-          Math.cos(toRadian(this._pose.theta + photocellConst.offsetAngle)) *
-            photocellConst.offset
+    return this.#isDarkAtPosition(
+      this.#calculatePhotocellPosition(
+        this._pose.theta + photocellConst.offsetAngle
       )
     );
-    const y = Math.floor(
-      toPixel(
-        this._pose.y +
-          Math.sin(toRadian(this._pose.theta + photocellConst.offsetAngle)) *
-            photocellConst.offset
-      )
-    );
-    return this.#isDarkAtPosition(x, y);
   }
 
   /**
@@ -136,25 +120,26 @@ export default class LoiMvSimulator extends LoiMvMapper {
     this.#startPermanentCalculation(vL, vR);
   }
 
+  /**
+   *
+   * @returns {number}
+   */
+  ultraschall() {
+    return this._sonar.ping(DigitalPin.P8, DigitalPin.P9, PingUnit.Centimeters);
+  }
+
   #startPermanentCalculation(vL, vR) {
     this.commit(WorkerMessageKey.intervalCalculating, true);
     this._calculationInterval = setInterval(() => {
-      this._pose = calculateNewPose(
-        this._pose[0],
-        this._pose[1],
-        this._pose[2],
-        vL,
-        vR
-      );
-      this.commit(WorkerMessageKey.pose, this._pose);
+      this.#singleCalculation(vL, vR);
     }, deltaT * 1000);
   }
 
   #singleCalculation(vL, vR) {
     this._pose = calculateNewPose(
-      this._pose[0],
-      this._pose[1],
-      this._pose[2],
+      this._pose.x,
+      this._pose.y,
+      this._pose.theta,
       vL,
       vR
     );
@@ -169,21 +154,31 @@ export default class LoiMvSimulator extends LoiMvMapper {
 
   /**
    *
-   * @param {number} power motor
+   * @param {number} power motor (1...10)
    * @return {number} m/s
    */
   #translateToSpeed(power) {
-    return power / 40;
+    return (vehicleConst.maxSpeed / 10) * power;
+  }
+
+  #calculatePhotocellPosition(angle) {
+    const x = Math.floor(
+      toPixel(this._pose.x + Math.cos(toRadian(angle)) * photocellConst.offset)
+    );
+    const y = Math.floor(
+      toPixel(this._pose.y + Math.sin(toRadian(angle)) * photocellConst.offset)
+    );
+    return { x: x, y: y };
   }
 
   /**
-   *
-   * @param {number} x
-   * @param {number} y
-   * @return {0|1}
+   * Überprüft, ob an gegebener Position der Untergrund nicht weiß ist.
+   * weiß = hell; !weiß = dunkel
+   * @param {{x: number, y: number}} zu überprüfende Position
+   * @return {0|1} 0 = hell, 1 = dunkel
    */
-  #isDarkAtPosition(x, y) {
-    const index = 4 * (y * stageWidth + x);
-    return this._backgroundImageData[index] > 0 ? 1 : 0; //TODO hell oder dunkel?
+  #isDarkAtPosition({ x, y }) {
+    const index = 4 * (y * this._backgroundImageData.width + x);
+    return this._backgroundImageData.data[index] > 0 ? 0 : 1;
   }
 }

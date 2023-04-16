@@ -11,6 +11,7 @@ import LoiMvSimulator from "@/compositions/simulator/LoiMvSimulator";
 import I2cLcdSimulator from "@/compositions/simulator/I2cLcdSimulator";
 import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
 import SonarSimulator from "@/compositions/simulator/SonarSimulator";
+import { setStageWidth } from "@/compositions/Consts";
 
 /**
  *
@@ -25,28 +26,32 @@ import SonarSimulator from "@/compositions/simulator/SonarSimulator";
  * @param pose
  * @param backgroundImageData
  * @param backgroundWidth
+ * @param obstacles
  * @return {Promise<void>} outputLog,
  */
 self.onmessage = async ({
   data: {
+    stageWidth,
     code,
     vehicleColor,
     vehicleLabel,
     startTime,
     pose,
     backgroundImageData,
+    obstacles,
   },
 }) => {
+  setStageWidth(stageWidth);
   const basic = new BasicSimulator(vehicleColor, vehicleLabel);
   const input = new InputSimulator(startTime, pose);
   const music = new MusicSimulator();
   const led = new LedSimulator();
   const radio = new RadioSimulator();
   const loops = new LoopsSimulator();
-  const LOI_MV = new LoiMvSimulator(pose, backgroundImageData);
+  const sonar = new SonarSimulator(pose, obstacles);
+  const LOI_MV = new LoiMvSimulator(pose, backgroundImageData, sonar);
   const I2C_LCD1602 = new I2cLcdSimulator(vehicleColor, vehicleLabel);
   const neopixel = new NeopixelSimulator();
-  const sonar = new SonarSimulator();
 
   eval(code);
 };

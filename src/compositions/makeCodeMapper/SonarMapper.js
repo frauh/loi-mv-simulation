@@ -10,14 +10,16 @@ export default class SonarMapper extends Simulator {
    * @param {DigitalPin} trig
    * @param {DigitalPin} echo
    * @param {PingUnit} unit
+   * @param {number} maxCmDistance
    * @return {number}
    */
-  ping(trig, echo, unit) {
+  ping(trig, echo, unit, maxCmDistance = 500) {
     this.notSupported(
       "Sonar.ping",
       trig.toString(),
       echo.toString(),
-      unit.toString()
+      unit.toString(),
+      maxCmDistance
     );
     return 0;
   }

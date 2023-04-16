@@ -12,7 +12,7 @@ export default class InputSimulator extends InputMapper {
    * @return {number}
    */
   compassHeading() {
-    return (this.pose.theta + 90) % 360;
+    return (this._pose.theta + 90) % 360;
   }
 
   /**
