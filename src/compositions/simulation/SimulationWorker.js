@@ -12,30 +12,31 @@ import I2cLcdSimulator from "@/compositions/simulator/I2cLcdSimulator";
 import NeopixelSimulator from "@/compositions/simulator/NeopixelSimulator";
 import SonarSimulator from "@/compositions/simulator/SonarSimulator";
 import { setStageWidth } from "@/compositions/Consts";
+import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 
 /**
  *
  * Lade Simulator, um alle potenziellen Befehle aus MakeCode damit abfangen zu können.
  * Die Konstanten müssen so benannt sein, dass sie dem Präfix aus MakeCode entsprechen.
- * Führe anschließend den Code aus. --> Achtung: Sicherheitsrisiko
+ * Führt anschließend den Code aus. --> Achtung: Sicherheitsrisiko
  *
- * @param code
+ * @param stageWidth
+ * @param startCode
+ * @param functions
  * @param vehicleColor
  * @param vehicleLabel
- * @param startTime
  * @param pose
  * @param backgroundImageData
- * @param backgroundWidth
  * @param obstacles
- * @return {Promise<void>} outputLog,
+ * @return {Promise<void>},
  */
 self.onmessage = async ({
   data: {
     stageWidth,
-    code,
+    startCode,
+    functions,
     vehicleColor,
     vehicleLabel,
-    startTime,
     pose,
     backgroundImageData,
     obstacles,
@@ -43,7 +44,7 @@ self.onmessage = async ({
 }) => {
   setStageWidth(stageWidth);
   const basic = new BasicSimulator(vehicleColor, vehicleLabel);
-  const input = new InputSimulator(startTime, pose);
+  const input = new InputSimulator(Date.now(), pose);
   const music = new MusicSimulator();
   const led = new LedSimulator();
   const radio = new RadioSimulator();
@@ -53,7 +54,16 @@ self.onmessage = async ({
   const I2C_LCD1602 = new I2cLcdSimulator(vehicleColor, vehicleLabel);
   const neopixel = new NeopixelSimulator();
 
-  eval(code);
+  if (functions) {
+    self.postMessage({
+      key: WorkerMessageKey.functions,
+      value: true,
+    });
+  }
+  eval(startCode);
+  for (let entryPoint of functions) {
+    eval(entryPoint);
+  }
 };
 
 /**

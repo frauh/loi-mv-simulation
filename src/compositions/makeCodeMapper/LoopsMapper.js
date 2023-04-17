@@ -7,11 +7,11 @@ export default class LoopsMapper extends Simulator {
   /**
    * alle ... ms
    * Entrypoint vgl. Parser
-   * @param {number} intervall
+   * @param {number} interval
    * @param {function} handler
    */
-  everyInterval(intervall, handler) {
+  everyInterval(interval, handler) {
     // TODO entrypoint
-    this.notSupported("Schleifen.alle ms", intervall, handler.toString());
+    this.notSupported("Schleifen.alle ms", interval, handler.toString());
   }
 }

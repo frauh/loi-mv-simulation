@@ -54,7 +54,6 @@ export default class LoiMvSimulator extends LoiMvMapper {
         } else {
           this.#stopCalculation();
         }
-        console.log(difference);
       }, deltaT * 1000);
     } else {
       // Rechtsdrehung

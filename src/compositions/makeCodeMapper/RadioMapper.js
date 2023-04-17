@@ -10,7 +10,6 @@ export default class RadioMapper extends Simulator {
    * @param {function} handler
    */
   onReceivedNumber(handler) {
-    //TODO entrypoint
     this.notSupported("Funk.wennZahlEmpfangen", handler.toString());
   }
 
@@ -20,7 +19,6 @@ export default class RadioMapper extends Simulator {
    * @param {function} handler
    */
   onReceivedString(handler) {
-    //TODO entrypoint
     this.notSupported("Funk.wennZahlEmpfangen", handler.toString());
   }
 
@@ -30,7 +28,6 @@ export default class RadioMapper extends Simulator {
    * @param {function} handler
    */
   onReceivedValue(handler) {
-    //TODO entrypoint
     this.notSupported("Funk.wennZahlEmpfangen", handler.toString());
   }
 

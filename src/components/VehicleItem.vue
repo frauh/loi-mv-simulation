@@ -86,7 +86,11 @@ export default {
       this.$refs.fileInput.click();
     },
     handleFileUpload() {
-      this.fileName = this.$refs.fileInput.files[0].name;
+      let fileName = this.$refs.fileInput.files[0].name;
+      if (fileName.length > 13 && fileName.startsWith("microbit-")) {
+        fileName = fileName.slice(9);
+      }
+      this.fileName = fileName.slice(0, fileName.lastIndexOf("."));
       this.$parent.$emit(
         "programUpload",
         this.vehicle.id,

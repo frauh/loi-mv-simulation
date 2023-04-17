@@ -87,22 +87,29 @@ export default {
   },
   mounted() {
     //TODO for testing
-    let vehicle = new Vehicle("red", "test");
-    vehicle.program = parseProgramCode(
-      // 'basic.showString("links: " + LOI_MV.helligkeitLinks())\n' +
-      //   'basic.showString("rechts: " + LOI_MV.helligkeitRechts())\n'
-      'basic.showString("sonar: " + LOI_MV.ultraschall())\n'
-    );
-    this.vehicles.set(vehicle.id, vehicle);
-    this.$refs.simulationArea.drawVehicleModel(vehicle);
-
-    // let robo = new Vehicle("blue", "robo");
-    // robo.program = parseProgramCode(
-    //   // "LOI_MV.antrieb(10, 3)\nbasic.pause(3000)\nLOI_MV.antrieb(0, 0)\n"
-    //   "LOI_MV.graddrehung(-90, 0)\n"
+    // let vehicle = new Vehicle("red", "test");
+    // vehicle.program = parseProgramCode(
+    //   "basic.forever(function () {\n" +
+    //     "    LOI_MV.antrieb(10, 0)\n" +
+    //     "    basic.pause(1000)\n" +
+    //     "    LOI_MV.antrieb(0, 0)\n" +
+    //     "    basic.pause(5000)\n" +
+    //     "})"
     // );
-    // this.vehicles.set(robo.id, robo);
-    // this.$refs.simulationArea.drawVehicleModel(robo);
+    // this.vehicles.set(vehicle.id, vehicle);
+    // this.$refs.simulationArea.drawVehicleModel(vehicle);
+
+    let robo = new Vehicle("blue", "robo");
+    robo.program = parseProgramCode(
+      "loops.everyInterval(3000, function () {\n" +
+        "    LOI_MV.antrieb(10, 0)\n" +
+        "})\n" +
+        "loops.everyInterval(2000, function () {\n" +
+        "    LOI_MV.antrieb(0, 0)\n" +
+        "})"
+    );
+    this.vehicles.set(robo.id, robo);
+    this.$refs.simulationArea.drawVehicleModel(robo);
   },
   updated() {
     if (

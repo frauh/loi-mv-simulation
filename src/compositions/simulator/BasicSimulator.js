@@ -1,12 +1,24 @@
 import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 import BasicMapper from "@/compositions/makeCodeMapper/BasicMapper";
 import { ArrowNames } from "@/compositions/simulation/SimulationWorker";
+import { clock } from "@/compositions/Consts";
 
 export default class BasicSimulator extends BasicMapper {
   constructor(vehicleColor, vehicleLabel) {
     super();
     this._vehicleColor = vehicleColor;
     this._vehicleLabel = vehicleLabel;
+  }
+
+  /**
+   * dauerhaft
+   * Entrypoint vgl. Parser
+   * @param {function} handler
+   * @param pause
+   */
+  forever(handler, pause) {
+    handler();
+    setInterval(handler, pause + clock);
   }
 
   /**

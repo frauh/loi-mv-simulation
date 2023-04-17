@@ -4,6 +4,7 @@ const WorkerMessageKey = {
   neoPixelColor: "neoPixelColor",
   intervalCalculating: "intervalCalculating",
   evalFinished: "evalFinished",
+  functions: "functions",
 };
 
 export default WorkerMessageKey;

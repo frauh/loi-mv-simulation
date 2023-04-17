@@ -17,6 +17,18 @@ export function setStageWidth(pixel) {
 }
 
 /**
+ * Versatz, der bei allen sich wiederholenden Blöcken verwendet wird
+ * als minimales Zeitintervall zwischen den Iterationen.
+ * Der Start einer neuen Iteration ist unabhängig davon, ob die vorherige schon beendet worden ist.
+ * Ggf. ist der Wert also anzupassen, wenn ein durchlauf länger dauert.
+ * Beispiel:
+ * @see BasicSimulator.forever
+ * @see LoopsSimulator.everyInterval
+ * @type {number} Millisekunden
+ */
+export const clock = 5;
+
+/**
  * Berechnungsintervall der Kinematik
  * @type {number} Sekunden
  */
@@ -59,7 +71,7 @@ export const vehicleConst = {
    * Höchstgeschwindigkeit des Roboters
    * @type {number} Meter/Sekunde
    */
-  maxSpeed: 0.1,
+  maxSpeed: 0.3,
 
   /**
    * Abstand des Drehzentrum (Mittelpunkt der Achsen) vom Mittelpunkt des Roboters

@@ -11,7 +11,6 @@ export default class BasicMapper extends Simulator {
    * @param {function} handler
    */
   forever(handler) {
-    //TODO entrypoint
     this.notSupported("Grundlagen.dauerhaft", handler.toString());
   }
 

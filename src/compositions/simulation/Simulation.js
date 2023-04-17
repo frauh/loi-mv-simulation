@@ -12,13 +12,10 @@ export default class Simulation {
    * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
    */
   start(vehicles, backgroundLayerImageData, obstacles, logArea) {
-    let startTime = Date.now();
-
     vehicles.forEach((vehicle) => {
       vehicle.startPose = vehicle.pose;
 
-      if (vehicle.program && vehicle.program.start) {
-        //TODO auch für entrypoints
+      if (vehicle.program) {
         const worker = new Worker(
           new URL(
             "@/compositions/simulation/SimulationWorker.js",
@@ -28,10 +25,10 @@ export default class Simulation {
         this._workers.push(worker);
         worker.postMessage({
           stageWidth: stageWidth,
-          code: vehicle.program.start, //TODO auch für entrypoints
+          startCode: vehicle.program.start,
+          functions: JSON.parse(JSON.stringify(vehicle.program.functions)),
           vehicleColor: vehicle.color,
           vehicleLabel: vehicle.label,
-          startTime: startTime,
           pose: {
             x: vehicle.pose.x,
             y: vehicle.pose.y,
@@ -43,10 +40,11 @@ export default class Simulation {
 
         let isCalculating = false;
         let hasAlreadyFinished = false;
+        let evaluatingFunctions = false;
         worker.onmessage = ({ data: { key, value } }) => {
           switch (key) {
             case WorkerMessageKey.evalFinished:
-              if (!isCalculating) {
+              if (!isCalculating && !evaluatingFunctions) {
                 this._workers.splice(this._workers.indexOf(worker), 1);
                 worker.terminate();
               }
@@ -54,7 +52,7 @@ export default class Simulation {
               break;
             case WorkerMessageKey.intervalCalculating:
               isCalculating = value;
-              if (hasAlreadyFinished) {
+              if (hasAlreadyFinished && !evaluatingFunctions) {
                 this._workers.splice(this._workers.indexOf(worker), 1);
                 worker.terminate();
               }
@@ -68,6 +66,9 @@ export default class Simulation {
             case WorkerMessageKey.neoPixelColor:
               vehicle.neoPixelColor = value;
               break;
+            case WorkerMessageKey.functions:
+              evaluatingFunctions = true;
+              break;
             default:
               console.error(
                 "Ergebnis des Workers kann nicht zugeordnet werden:",
@@ -80,8 +81,6 @@ export default class Simulation {
           this.stop();
         };
       }
-      //TODO für Funktionen müsste beim Start auch erfüllt werden, da dort potentielle Variablen definiert sein können
-      // ggf. sharedworker, damit dort die variablen vom einen ins andere weitergegeben, wenn sie verändert wurden?
     });
   }
 

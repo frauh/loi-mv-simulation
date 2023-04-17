@@ -11,7 +11,6 @@ export default class InputMapper extends Simulator {
    * @param {function} handler
    */
   onButtonPressed(button, handler) {
-    //TODO entrypoint
     this.notSupported(
       "Eingabe.wennKnopfGeklickt",
       button.toString(),
@@ -26,7 +25,6 @@ export default class InputMapper extends Simulator {
    * @param {function} handler
    */
   onGesture(gesture, handler) {
-    //TODO entrypoint
     this.notSupported(
       "Eingabe.wennBewegt",
       gesture.toString(),
@@ -41,7 +39,6 @@ export default class InputMapper extends Simulator {
    * @param {function} handler
    */
   onPinPressed(name, handler) {
-    //TODO entrypoint
     this.notSupported(
       "Eingabe.wennPinGedrückt",
       name.toString(),
@@ -56,7 +53,6 @@ export default class InputMapper extends Simulator {
    * @param {function} handler
    */
   onPinReleased(name, handler) {
-    //TODO entrypoint
     this.notSupported(
       "Eingabe.wennPinLosgelassen",
       name.toString(),
