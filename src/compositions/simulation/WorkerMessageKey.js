@@ -3,7 +3,7 @@ const WorkerMessageKey = {
   outputLog: "outputLog",
   neoPixelColor: "neoPixelColor",
   intervalCalculating: "intervalCalculating",
-  evalFinished: "evalFinished",
+  startFinished: "startFinished",
   functions: "functions",
 };
 

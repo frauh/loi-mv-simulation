@@ -33,8 +33,7 @@ import WorkerMessageKey from "@/compositions/simulation/WorkerMessageKey";
 self.onmessage = async ({
   data: {
     stageWidth,
-    startCode,
-    functions,
+    program,
     vehicleColor,
     vehicleLabel,
     pose,
@@ -54,16 +53,16 @@ self.onmessage = async ({
   const I2C_LCD1602 = new I2cLcdSimulator(vehicleColor, vehicleLabel);
   const neopixel = new NeopixelSimulator();
 
-  if (functions) {
+  if (
+    !program.endsWith("self.postMessage({key: 'startFinished', value: true})\n")
+  ) {
     self.postMessage({
       key: WorkerMessageKey.functions,
       value: true,
     });
   }
-  eval(startCode);
-  for (let entryPoint of functions) {
-    eval(entryPoint);
-  }
+
+  eval(program);
 };
 
 /**

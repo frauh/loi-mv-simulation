@@ -101,12 +101,85 @@ export default {
 
     let robo = new Vehicle("blue", "robo");
     robo.program = parseProgramCode(
-      "loops.everyInterval(3000, function () {\n" +
-        "    LOI_MV.antrieb(10, 0)\n" +
+      "input.onButtonPressed(Button.A, function () {\n" +
+        '    radio.sendString("sicher")\n' +
         "})\n" +
-        "loops.everyInterval(2000, function () {\n" +
-        "    LOI_MV.antrieb(0, 0)\n" +
-        "})"
+        "radio.onReceivedString(function (receivedString) {\n" +
+        '    if (receivedString == "gefahr") {\n' +
+        "        welle = 1\n" +
+        '    } else if (receivedString == "sicher") {\n' +
+        "        welle = 0\n" +
+        "    }\n" +
+        "})\n" +
+        "input.onButtonPressed(Button.B, function () {\n" +
+        '    radio.sendString("gefahr")\n' +
+        "})\n" +
+        "let welle = 0\n" +
+        "LOI_MV.init(false)\n" +
+        "let zustand = 0\n" +
+        "radio.setGroup(42)\n" +
+        "basic.forever(function () {\n" +
+        "    if (zustand == 0) {\n" +
+        "        LOI_MV.antrieb(10, 0)\n" +
+        "        basic.pause(300)\n" +
+        "        LOI_MV.antrieb(0, 0)\n" +
+        "        if (LOI_MV.helligkeitLinks() == 0 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 1\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 0\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 1) {\n" +
+        "            zustand = 2\n" +
+        "        }\n" +
+        "        if (welle == 1) {\n" +
+        "            zustand = 3\n" +
+        "        }\n" +
+        "    } else if (zustand == 1) {\n" +
+        "        LOI_MV.antrieb(10, -10)\n" +
+        "        basic.pause(300)\n" +
+        "        LOI_MV.antrieb(0, 0)\n" +
+        "        if (LOI_MV.helligkeitLinks() == 0 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 1\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 0\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 1) {\n" +
+        "            zustand = 2\n" +
+        "        }\n" +
+        "        if (welle == 1) {\n" +
+        "            zustand = 3\n" +
+        "        }\n" +
+        "    } else if (zustand == 2) {\n" +
+        "        LOI_MV.antrieb(10, 10)\n" +
+        "        basic.pause(300)\n" +
+        "        LOI_MV.antrieb(0, 0)\n" +
+        "        if (LOI_MV.helligkeitLinks() == 0 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 1\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 0) {\n" +
+        "            zustand = 0\n" +
+        "        } else if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 1) {\n" +
+        "            zustand = 2\n" +
+        "        }\n" +
+        "        if (welle == 1) {\n" +
+        "            zustand = 4\n" +
+        "        }\n" +
+        "    } else if (zustand == 3) {\n" +
+        "        LOI_MV.antrieb(10, -10)\n" +
+        "        basic.pause(300)\n" +
+        "        LOI_MV.antrieb(0, 0)\n" +
+        "        if (LOI_MV.helligkeitLinks() == 1 && LOI_MV.helligkeitRechts() == 1) {\n" +
+        "            zustand = 4\n" +
+        "        } else {\n" +
+        "            zustand = 3\n" +
+        "        }\n" +
+        "    } else if (zustand == 4) {\n" +
+        "        LOI_MV.antrieb(0, 0)\n" +
+        "        basic.pause(300)\n" +
+        "        if (welle == 1) {\n" +
+        "            zustand = 4\n" +
+        "        } else if (welle == 0) {\n" +
+        "            zustand = 2\n" +
+        "        }\n" +
+        "    }\n" +
+        "})\n"
     );
     this.vehicles.set(robo.id, robo);
     this.$refs.simulationArea.drawVehicleModel(robo);

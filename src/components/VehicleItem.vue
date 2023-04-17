@@ -87,7 +87,10 @@ export default {
     },
     handleFileUpload() {
       let fileName = this.$refs.fileInput.files[0].name;
-      if (fileName.length > 13 && fileName.startsWith("microbit-")) {
+      if (
+        fileName.length > 13 &&
+        (fileName.startsWith("microbit-") || fileName.startsWith("microbit_"))
+      ) {
         fileName = fileName.slice(9);
       }
       this.fileName = fileName.slice(0, fileName.lastIndexOf("."));

@@ -25,8 +25,7 @@ export default class Simulation {
         this._workers.push(worker);
         worker.postMessage({
           stageWidth: stageWidth,
-          startCode: vehicle.program.start,
-          functions: JSON.parse(JSON.stringify(vehicle.program.functions)),
+          program: vehicle.program,
           vehicleColor: vehicle.color,
           vehicleLabel: vehicle.label,
           pose: {
@@ -43,7 +42,7 @@ export default class Simulation {
         let evaluatingFunctions = false;
         worker.onmessage = ({ data: { key, value } }) => {
           switch (key) {
-            case WorkerMessageKey.evalFinished:
+            case WorkerMessageKey.startFinished:
               if (!isCalculating && !evaluatingFunctions) {
                 this._workers.splice(this._workers.indexOf(worker), 1);
                 worker.terminate();

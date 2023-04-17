@@ -19,7 +19,7 @@ export default class RadioMapper extends Simulator {
    * @param {function} handler
    */
   onReceivedString(handler) {
-    this.notSupported("Funk.wennZahlEmpfangen", handler.toString());
+    this.notSupported("Funk.wennTextEmpfangen", handler.toString());
   }
 
   /**
@@ -28,7 +28,7 @@ export default class RadioMapper extends Simulator {
    * @param {function} handler
    */
   onReceivedValue(handler) {
-    this.notSupported("Funk.wennZahlEmpfangen", handler.toString());
+    this.notSupported("Funk.wennWertepaarEmpfangen", handler.toString());
   }
 
   /**

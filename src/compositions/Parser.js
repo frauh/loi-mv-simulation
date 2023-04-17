@@ -3,10 +3,11 @@
  * Trennt unterschiedliche Codeblöcke voneinander und sucht nach besonderen Befehlen, die ersetzt werden müssen.
  * Fügt am Ende des Codes das Senden einer Nachricht ein, die der ausführende SimulationWorker.js an die Simulation.js sendet.
  * @param code
- * @return {{functions: [], start: string}}
+ * @return {string}
  */
 export default function parseProgramCode(code) {
-  return doReplacements(separateStartFrom(code));
+  let program = doReplacements(separateStartFrom(code));
+  return program.start.concat(program.functions.join(""));
 }
 
 /**
@@ -54,7 +55,7 @@ function doReplacements(program) {
   if (program.start) {
     result.start = searchAndReplacePause(
       program.start.concat(
-        "self.postMessage({key: 'evalFinished', value: true})\n"
+        "self.postMessage({key: 'startFinished', value: true})\n"
       )
     ).code;
   }
@@ -108,7 +109,7 @@ function findEndOfPause(code) {
     // beide -1: keine Verzweigungen, Schleifen oder Funktionen
     beforeEnd = code;
     afterEnd = "";
-  } else if (open === -1 && close >= 0) {
+  } else if ((open === -1 && close >= 0) || open > close) {
     // pause befand sich innerhalb einer {}, die damit geschlossen wird
     beforeEnd = code.slice(0, close);
     afterEnd = code.slice(close);

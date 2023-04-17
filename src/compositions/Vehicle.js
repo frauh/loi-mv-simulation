@@ -6,7 +6,7 @@ export default class Vehicle {
   color = "";
   label = "";
   isTracked = false;
-  program = { start: "", functions: [] };
+  program = "";
   pose;
   startPose;
   neoPixelColor = "";
