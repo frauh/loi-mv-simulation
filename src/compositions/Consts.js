@@ -68,6 +68,24 @@ export const vehicleConst = {
   b: 0.143,
 
   /**
+   * Breite (Höhe in 2D) der Karosserie ohne Räder
+   * @type {number} Meter
+   */
+  bodyHeight: 0,
+
+  /**
+   * Abstand des Vorderrades nach vorne
+   * @type {number} Meter
+   */
+  wheelFrontDistance: 0,
+
+  /**
+   * Abstand des Hinterrades nach horne
+   * @type {number} Meter
+   */
+  wheelRearDistance: 0,
+
+  /**
    * Höchstgeschwindigkeit des Roboters
    * @type {number} Meter/Sekunde
    */

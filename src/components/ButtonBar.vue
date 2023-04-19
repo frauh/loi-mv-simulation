@@ -9,7 +9,7 @@
     />
     <ControlButton
       :style="isRunning ? 'display:inherit' : 'display:none'"
-      color="red"
+      color="crimson"
       description="Simulation stoppen"
       icon="fas fa-stop"
       @btn-click="$emit('stopSimulation')"
@@ -82,7 +82,7 @@
       </div>
       <div class="modal-row">
         <ControlButton
-          color="black"
+          color="steelblue"
           description="Linien auf Untergrund zeichnen"
           icon="fas fa-pen"
           @btn-click="
@@ -102,7 +102,7 @@
       </div>
       <div class="modal-row">
         <ControlButton
-          color="black"
+          color="steelblue"
           description="Linien vom Untergrund löschen"
           icon="fas fa-eraser"
           @btn-click="
@@ -137,7 +137,7 @@
     <div class="modal-column">
       <div class="modal-row">
         <ControlButton
-          color="black"
+          color="steelblue"
           description="rundes Hindernis hinzufügen"
           icon="fas fa-circle-plus"
           @btn-click="
@@ -146,7 +146,7 @@
           "
         />
         <ControlButton
-          color="black"
+          color="steelblue"
           description="viereckiges Hindernis hinzufügen"
           icon="fas fa-square-plus"
           @btn-click="
@@ -155,7 +155,7 @@
           "
         />
         <ControlButton
-          color="black"
+          color="crimson"
           description="Hindernis entfernen"
           icon="fas fa-ban"
           @btn-click="
@@ -163,6 +163,19 @@
             showObstacleModal = false;
           "
         />
+      </div>
+      <div class="checkbox-wrapper">
+        <label for="obstacleBorder" class="description"
+          >Simulationsbereich begrenzen</label
+        >
+        <label id="obstacleBorder" class="switch" for="checkbox">
+          <input
+            type="checkbox"
+            id="checkbox"
+            v-model="this.$parent.$data.simulationAreaBorderAsObstacle"
+          />
+          <div class="check-slider round"></div>
+        </label>
       </div>
     </div>
   </VueModal>
@@ -271,17 +284,17 @@ export default {
 }
 
 .modal-row > label {
-  color: steelblue;
+  margin-left: auto;
 }
 
 .clickableLabel {
-  color: red;
+  color: crimson;
   cursor: pointer;
 }
 
 .description {
-  margin-left: auto;
   margin-right: 5px;
+  color: steelblue;
 }
 
 .slider {
@@ -317,5 +330,62 @@ export default {
   border-radius: 10px;
   background: steelblue;
   cursor: pointer;
+}
+
+.checkbox-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.checkbox-wrapper .switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.checkbox-wrapper .switch input {
+  display: none;
+}
+
+.checkbox-wrapper .check-slider {
+  background-color: lightgray;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: 0.4s;
+}
+
+.checkbox-wrapper .check-slider:before {
+  background-color: white;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: 0.4s;
+  width: 26px;
+}
+
+.checkbox-wrapper input:checked + .check-slider {
+  background-color: steelblue;
+}
+
+.checkbox-wrapper input:checked + .check-slider:before {
+  transform: translateX(26px);
+}
+
+.checkbox-wrapper .check-slider.round {
+  border-radius: 34px;
+}
+
+.checkbox-wrapper .check-slider.round:before {
+  border-radius: 50%;
 }
 </style>

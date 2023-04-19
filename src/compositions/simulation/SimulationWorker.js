@@ -49,7 +49,12 @@ self.onmessage = async ({
   const radio = new RadioSimulator();
   const loops = new LoopsSimulator();
   const sonar = new SonarSimulator(pose, obstacles);
-  const LOI_MV = new LoiMvSimulator(pose, backgroundImageData, sonar);
+  const LOI_MV = new LoiMvSimulator(
+    pose,
+    backgroundImageData,
+    obstacles,
+    sonar
+  );
   const I2C_LCD1602 = new I2cLcdSimulator(vehicleColor, vehicleLabel);
   const neopixel = new NeopixelSimulator();
 

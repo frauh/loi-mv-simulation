@@ -33,7 +33,7 @@
           @toggle="$emit('toggleTracking')"
         />
         <ControlButton
-          color="red"
+          color="crimson"
           description="Fahrzeug löschen"
           icon="fas fa-trash-can"
           @btn-click="showDeleteModal = true"
@@ -44,7 +44,9 @@
   <VueModal v-model="showDeleteModal" title="Bitte bestätigen">
     <div>
       <label
-        >Möchtest du das Fahrzeug "{{ vehicle.label }}" wirklich löschen?</label
+        >Möchtest du das Fahrzeug
+        <b :style="{ color: vehicle.color }">{{ vehicle.label }}</b>
+        wirklich löschen?</label
       >
       <div class="modal-button-group">
         <button class="submit-button" @click="$emit('deleteVehicle')">

@@ -4,7 +4,7 @@ import { sonarConst, toMeter, toPixel, toRadian } from "@/compositions/Consts";
 
 export default class SonarSimulator extends SonarMapper {
   /**
-   * macimale Entfernung, die vom Sensor gemessen wird
+   * maximale Entfernung, die vom Sensor gemessen wird
    * @private
    * @type {number}
    */
@@ -13,7 +13,22 @@ export default class SonarSimulator extends SonarMapper {
   constructor(pose, obstacles) {
     super();
     this._pose = pose;
-    this._obstacles = obstacles;
+    this._obstacleBorders = [];
+    obstacles.forEach((obstacle) => {
+      switch (obstacle.type) {
+        case "Circle":
+          this.#addCircleBorder(obstacle.position, obstacle.width / 2);
+          break;
+        case "Rect":
+          this.#addRectangleBorder(
+            obstacle.position,
+            obstacle.width,
+            obstacle.height,
+            obstacle.rotation
+          );
+          break;
+      }
+    });
   }
 
   /**
@@ -32,28 +47,12 @@ export default class SonarSimulator extends SonarMapper {
     }
     this._maxDistance = maxCmDistance / 100 + sonarConst.offset;
     let minDistance = this._maxDistance;
-    this._obstacles.forEach((obstacle) => {
-      let newMin;
-      switch (obstacle.type) {
-        case "Circle":
-          newMin = this.#calculateCircleDistance(
-            obstacle.position,
-            obstacle.width / 2
-          );
-          break;
-        case "Rect":
-          newMin = this.#calculateRectDistance(
-            obstacle.position,
-            obstacle.width,
-            obstacle.height,
-            obstacle.rotation
-          );
-          break;
-      }
-      if (!newMin || newMin < minDistance) {
-        minDistance = newMin;
-      }
-    });
+    let newMin = this.#calculateLowestDistanceInsideMeasurementAngle(
+      this._obstacleBorders
+    );
+    if (newMin < minDistance) {
+      minDistance = newMin;
+    }
     minDistance = minDistance * sonarConst.inaccuracy;
     return unit === PingUnit.Inches
       ? (minDistance - sonarConst.offset) * 39.37008
@@ -61,39 +60,34 @@ export default class SonarSimulator extends SonarMapper {
   }
 
   /**
-   * Berechnet die Abstände zu den Punkten auf dem Rand des Kreises. In Pixel
-   * @param {number} center Kreismittelpunk
+   * Identifiziert Punkte auf dem Rand des Kreises und fügt diese this._obstacleBorder hinzu. In Pixel
+   * @param {{x: number, y: number}} center Kreismittelpunk
    * @param {number} radius Radius
-   * @returns {number} niedrigster Abstand
    */
-  #calculateCircleDistance(center, radius) {
-    let borderPoints = [];
+  #addCircleBorder(center, radius) {
     const step = Math.PI / radius;
     for (let i = 0; i < 2 * Math.PI; i += step) {
-      borderPoints.push({
+      this._obstacleBorders.push({
         x: center.x + radius * Math.cos(i),
         y: center.y + radius * Math.sin(i),
       });
     }
-    return this.#calculateLowestDistanceInsideMeasurementAngle(borderPoints);
   }
 
   /**
-   * Berechnet die Abstände zu den Punkten auf dem Rand des Vierecks. In Pixel
+   * Identifiziert Punkte auf dem Rand des Vierecks und fügt diese this._obstacleBorder hinzu. In Pixel
    * @param {{x: number, y: number}} topLeft Koordinate der linken oberen Ecke des ungedrehten Vierecks
    * @param {number} width Breite des Vierecks
    * @param {number} height Höhe des Vierecks
    * @param {number} rotation Winkel, um den das Viereck gedreht ist in Grad
-   * @returns {number} niedrigster Abstand
    */
-  #calculateRectDistance(topLeft, width, height, rotation) {
+  #addRectangleBorder(topLeft, width, height, rotation) {
     rotation = toRadian(rotation);
-    let borderPoints = [];
     const bottomRight = { x: topLeft.x + width, y: topLeft.y + height };
     const xRotationFaktor = Math.cos(rotation);
     const yRotationFaktor = Math.sin(rotation);
     for (let i = topLeft.x; i < bottomRight.x; i++) {
-      borderPoints.push(
+      this._obstacleBorders.push(
         {
           x: i * xRotationFaktor + i * yRotationFaktor,
           y: topLeft.y * xRotationFaktor + topLeft.y * yRotationFaktor,
@@ -105,7 +99,7 @@ export default class SonarSimulator extends SonarMapper {
       );
     }
     for (let i = topLeft.y; i < bottomRight.y; i++) {
-      borderPoints.push(
+      this._obstacleBorders.push(
         {
           x: topLeft.x * xRotationFaktor + topLeft.x * yRotationFaktor,
           y: i * xRotationFaktor + i * yRotationFaktor,
@@ -116,7 +110,6 @@ export default class SonarSimulator extends SonarMapper {
         }
       );
     }
-    return this.#calculateLowestDistanceInsideMeasurementAngle(borderPoints);
   }
 
   /**
@@ -205,7 +198,7 @@ export default class SonarSimulator extends SonarMapper {
    * @returns {boolean}
    */
   #hasLineIntersection(a, b, c, d) {
-    // Vier Positionierungen für zwei Gerade und jeweils einen Punkt der anderen Geraden
+    // Vier Positionierungen für zwei Geraden und jeweils einen Punkt der anderen Geraden
     let dir1 = this.#lineDirectionOfPoint(a, b, c);
     let dir2 = this.#lineDirectionOfPoint(a, b, d);
     let dir3 = this.#lineDirectionOfPoint(c, d, a);
@@ -216,22 +209,6 @@ export default class SonarSimulator extends SonarMapper {
       (dir2 === 0 && this.#isPointOnLine(a, b, d)) || // Punkt D liegt auf AB
       (dir3 === 0 && this.#isPointOnLine(c, d, a)) || // Punkt A liegt auf CD
       (dir4 === 0 && this.#isPointOnLine(c, d, b)) // Punkt B liegt auf CD
-    );
-  }
-
-  /**
-   * Prüft, ob ein Punkt auf der Geraden AB liegt.
-   * @param {{x: number, y: number}} a Startpunkt der Gerade
-   * @param {{x: number, y: number}} b Endpunkt der Gerade
-   * @param {{x: number, y: number}} proof zu überprüfender Punkt
-   * @returns {boolean}
-   */
-  #isPointOnLine(a, b, proof) {
-    return (
-      proof.x <= Math.max(a.x, b.x) &&
-      proof.x <= Math.min(a.x, b.x) &&
-      proof.y <= Math.max(a.y, b.y) &&
-      proof.y <= Math.min(a.y, b.y)
     );
   }
 
@@ -251,5 +228,21 @@ export default class SonarSimulator extends SonarMapper {
     } else {
       return 1;
     }
+  }
+
+  /**
+   * Prüft, ob ein Punkt auf der Geraden AB liegt.
+   * @param {{x: number, y: number}} a Startpunkt der Gerade
+   * @param {{x: number, y: number}} b Endpunkt der Gerade
+   * @param {{x: number, y: number}} proof zu überprüfender Punkt
+   * @returns {boolean}
+   */
+  #isPointOnLine(a, b, proof) {
+    return (
+      proof.x <= Math.max(a.x, b.x) &&
+      proof.x <= Math.min(a.x, b.x) &&
+      proof.y <= Math.max(a.y, b.y) &&
+      proof.y <= Math.min(a.y, b.y)
+    );
   }
 }

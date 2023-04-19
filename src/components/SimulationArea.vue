@@ -1,8 +1,22 @@
 <template>
-  <div class="area">
+  <div class="area" :class="{ obstacle: simulationAreaBorderAsObstacle }">
     <div id="container" ref="container" class="container"></div>
     <h3 class="heading-left">{{ title }}</h3>
   </div>
+  <VueModal v-model="collision.happened" title="Achtung Unfall">
+    <label
+      >Während der Simulation kollidierte
+      <b :style="{ color: collision.involved.color }">{{
+        collision.involved.label
+      }}</b>
+      mit einem anderen Objekt. Die Simulation wurde abgebrochen.</label
+    >
+    <div class="modal-button-group">
+      <button class="close-button" @click="collision.happened = false">
+        Oh Nein!
+      </button>
+    </div>
+  </VueModal>
 </template>
 
 <script>
@@ -16,9 +30,11 @@ import {
   toPixel,
   vehicleConst,
 } from "@/compositions/Consts";
+import VueModal from "@kouts/vue-modal";
 
 export default {
   name: "SimulationArea",
+  components: { VueModal },
   props: {
     title: String,
     vehicleLayer: Konva.Layer,
@@ -27,6 +43,7 @@ export default {
     backgroundLayer: Konva.Layer,
     obstacleLayer: Konva.Layer,
     removingObstacles: Boolean,
+    simulationAreaBorderAsObstacle: Boolean,
   },
   emits: ["stopSimulation", "stopRemovingObstacles"],
   data() {
@@ -37,6 +54,8 @@ export default {
       aspectRatio: ratioConst.background,
       cursorSize: 24,
       isDrawing: false,
+      collisionHappened: false,
+      collision: { happened: false, involved: null },
     };
   },
   mounted() {
@@ -328,7 +347,7 @@ export default {
       const canvas = document.createElement("canvas");
       canvas.width = this.cursorSize;
       canvas.height = this.cursorSize;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
       ctx.fillStyle = "steelblue";
       ctx.font = this.cursorSize.toString().concat("px FontAwesome");
       ctx.textAlign = "center";
@@ -363,9 +382,46 @@ export default {
   border-radius: 15px;
 }
 
+.obstacle {
+  border-image: repeating-linear-gradient(
+      -45deg,
+      yellow 0,
+      yellow 1em,
+      black 0,
+      black 2em
+    )
+    5;
+}
+
 .container {
   width: 100%;
   height: 100%;
   aspect-ratio: v-bind("aspectRatio");
+}
+
+.modal-button-group {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.modal-button-group > * {
+  display: inline-block;
+  width: 100%;
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  color: white;
+}
+
+.close-button {
+  margin-right: 0;
+  background: crimson;
 }
 </style>

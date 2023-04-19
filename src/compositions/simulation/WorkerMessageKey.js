@@ -5,6 +5,7 @@ const WorkerMessageKey = {
   intervalCalculating: "intervalCalculating",
   startFinished: "startFinished",
   functions: "functions",
+  collision: "collision",
 };
 
 export default WorkerMessageKey;

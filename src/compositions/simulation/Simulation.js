@@ -11,7 +11,13 @@ export default class Simulation {
   /**
    * Initialisiere die Simulation und starte für jeden Startpunkt/Entrypoint einen Worker, der unabhängig den MakeCode-Code ausführt
    */
-  start(vehicles, backgroundLayerImageData, obstacles, logArea) {
+  start(
+    vehicles,
+    backgroundLayerImageData,
+    obstacles,
+    logArea,
+    simulationArea
+  ) {
     vehicles.forEach((vehicle) => {
       vehicle.startPose = vehicle.pose;
 
@@ -68,6 +74,10 @@ export default class Simulation {
             case WorkerMessageKey.functions:
               evaluatingFunctions = true;
               break;
+            case WorkerMessageKey.collision:
+              this.stop();
+              simulationArea.collision = { happened: value, involved: vehicle };
+              break;
             default:
               console.error(
                 "Ergebnis des Workers kann nicht zugeordnet werden:",
@@ -85,6 +95,7 @@ export default class Simulation {
 
   stop() {
     while (this._workers.length > 0) {
+      console.log(1);
       this._workers.pop().terminate();
     }
   }

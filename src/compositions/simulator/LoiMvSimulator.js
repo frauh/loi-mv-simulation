@@ -12,14 +12,16 @@ import {
   DigitalPin,
   PingUnit,
 } from "@/compositions/simulation/SimulationWorker";
+import Collision from "@/compositions/simulation/Collision";
 
 export default class LoiMvSimulator extends LoiMvMapper {
-  constructor(pose, backgroundImageData, sonar) {
+  constructor(pose, backgroundImageData, obstacles, sonar) {
     super();
     this._pose = pose;
     this._backgroundImageData = backgroundImageData;
-    this._calculationInterval = null;
     this._sonar = sonar;
+    this._calculationInterval = null;
+    this._collision = new Collision(obstacles);
   }
 
   /**
@@ -143,6 +145,9 @@ export default class LoiMvSimulator extends LoiMvMapper {
       vR
     );
     this.commit(WorkerMessageKey.pose, this._pose);
+    if (this._collision.happened(this._pose)) {
+      this.commit(WorkerMessageKey.collision, true);
+    }
   }
 
   #stopCalculation() {
