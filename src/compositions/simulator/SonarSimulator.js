@@ -17,11 +17,11 @@ export default class SonarSimulator extends SonarMapper {
     obstacles.forEach((obstacle) => {
       switch (obstacle.type) {
         case "Circle":
-          this.#addCircleBorder(obstacle.position, obstacle.width / 2);
+          this.#addCircleBorder(obstacle.center, obstacle.width);
           break;
         case "Rect":
           this.#addRectangleBorder(
-            obstacle.position,
+            obstacle.center,
             obstacle.width,
             obstacle.height,
             obstacle.rotation
@@ -76,14 +76,15 @@ export default class SonarSimulator extends SonarMapper {
 
   /**
    * Identifiziert Punkte auf dem Rand des Vierecks und fügt diese this._obstacleBorder hinzu. In Pixel
-   * @param {{x: number, y: number}} topLeft Koordinate der linken oberen Ecke des ungedrehten Vierecks
+   * @param {{x: number, y: number}} center Koordinate der linken oberen Ecke des ungedrehten Vierecks
    * @param {number} width Breite des Vierecks
    * @param {number} height Höhe des Vierecks
    * @param {number} rotation Winkel, um den das Viereck gedreht ist in Grad
    */
-  #addRectangleBorder(topLeft, width, height, rotation) {
+  #addRectangleBorder(center, width, height, rotation) {
     rotation = toRadian(rotation);
-    const bottomRight = { x: topLeft.x + width, y: topLeft.y + height };
+    const topLeft = { x: center.x - width, y: center.y - height };
+    const bottomRight = { x: center.x + width, y: center.y + height };
     const xRotationFaktor = Math.cos(rotation);
     const yRotationFaktor = Math.sin(rotation);
     for (let i = topLeft.x; i < bottomRight.x; i++) {
@@ -240,9 +241,9 @@ export default class SonarSimulator extends SonarMapper {
   #isPointOnLine(a, b, proof) {
     return (
       proof.x <= Math.max(a.x, b.x) &&
-      proof.x <= Math.min(a.x, b.x) &&
+      proof.x >= Math.min(a.x, b.x) &&
       proof.y <= Math.max(a.y, b.y) &&
-      proof.y <= Math.min(a.y, b.y)
+      proof.y >= Math.min(a.y, b.y)
     );
   }
 }

@@ -204,94 +204,86 @@ export default {
       let obstacle;
       let transformer;
       const size = 70;
-      switch (shape) {
-        case "circle":
-          obstacle = new Konva.Circle({
-            radius: size,
-            fillLinearGradientStartPoint: { x: -size, y: -size },
-            fillLinearGradientEndPoint: { x: size, y: size },
-          });
-          transformer = new Konva.Transformer({
-            enabledAnchors: [
-              "top-left",
-              "top-right",
-              "bottom-left",
-              "bottom-right",
-            ],
-          });
-          break;
-        case "rectangle":
-          obstacle = new Konva.Rect({
-            width: size * 2,
-            height: size * 2,
-            fillLinearGradientStartPoint: { x: 0, y: 0 },
-            fillLinearGradientEndPoint: { x: size * 2, y: size * 2 },
-          });
-          transformer = new Konva.Transformer({});
-          break;
-        default:
-          return;
-      }
-      obstacle.setAttrs({
-        x: randomPosition().x,
-        y: randomPosition().y,
-        stroke: "black",
-        strokeWidth: 3,
-        strokeScaleEnabled: false,
-        fillLinearGradientColorStops: this.calculateObstacleFilling(size),
-        draggable: true,
-        shadowColor: "black",
-        shadowBlur: 5,
-        shadowOffset: { x: 3, y: 3 },
-        shadowOpacity: 0.5,
-      });
-      this.obstacleLayer.add(obstacle);
-
-      transformer.setAttrs({
-        nodes: [obstacle],
-        keepRatio: true,
-        rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
-        borderEnabled: false,
-        anchorSize: 0,
-        borderStroke: "lightsteelblue",
-        anchorStroke: "lightsteelblue",
-        anchorFill: "lightsteelblue",
-        borderStrokeWidth: 2,
-      });
-      this.obstacleLayer.add(transformer);
-
-      this.addMouseEventsTo(obstacle, transformer);
-      obstacle.on("mousedown", () => {
-        if (this.removingObstacles) {
-          this.$emit("stopRemovingObstacles");
-          obstacle.destroy();
-          transformer.destroy();
+      let image = new Image();
+      image.src = require("@/assets/obstacle.png");
+      image.onload = () => {
+        switch (shape) {
+          case "circle":
+            obstacle = new Konva.Circle({
+              radius: size,
+            });
+            transformer = new Konva.Transformer({
+              enabledAnchors: [
+                "top-left",
+                "top-right",
+                "bottom-left",
+                "bottom-right",
+              ],
+              rotateEnabled: false,
+            });
+            break;
+          case "rectangle":
+            obstacle = new Konva.Rect({
+              width: size * 2,
+              height: size * 2,
+              offset: { x: size, y: size },
+            });
+            transformer = new Konva.Transformer({});
+            break;
+          default:
+            return;
         }
-      });
-      obstacle.on("transformend", () =>
         obstacle.setAttrs({
-          fillLinearGradientColorStops: this.calculateObstacleFilling(
-            obstacle.width() * obstacle.scale().x
-          ),
+          x: randomPosition().x,
+          y: randomPosition().y,
+          stroke: "black",
+          strokeWidth: 3,
+          strokeScaleEnabled: false,
+          draggable: true,
+          fillPatternImage: image,
+          fillPatternRotation: -45,
           shadowColor: "black",
           shadowBlur: 5,
           shadowOffset: { x: 3, y: 3 },
           shadowOpacity: 0.5,
-        })
-      );
-    },
-    calculateObstacleFilling(width) {
-      let result = [];
-      let step = 1 / width;
-      let thickness = Math.floor(width / 10);
-      for (let i = 0; i < width; i++) {
-        if (i % (2 * thickness) < thickness) {
-          result.push(i * step, "yellow");
-        } else {
-          result.push(i * step, "black");
-        }
-      }
-      return result;
+        });
+        this.obstacleLayer.add(obstacle);
+
+        transformer.setAttrs({
+          nodes: [obstacle],
+          keepRatio: true,
+          rotationSnaps: [0, 45, 90, 135, 180, 225, 270, 315],
+          borderEnabled: false,
+          anchorSize: 0,
+          borderStroke: "lightsteelblue",
+          anchorStroke: "lightsteelblue",
+          anchorFill: "lightsteelblue",
+          borderStrokeWidth: 2,
+        });
+        this.obstacleLayer.add(transformer);
+
+        this.addMouseEventsTo(obstacle, transformer);
+        obstacle.on("mousedown", () => {
+          if (this.removingObstacles) {
+            this.$emit("stopRemovingObstacles");
+            obstacle.destroy();
+            transformer.destroy();
+          }
+        });
+        obstacle.on("transform", () =>
+          obstacle.setAttrs({
+            fillPatternRotation: -obstacle.rotation() - 45,
+            fillPatternScale: {
+              x: 1 / obstacle.scaleX(),
+              y: 1 / obstacle.scaleY(),
+            },
+            shadowColor: "black",
+            shadowBlur: 5,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.5,
+          })
+        );
+      };
     },
     removeObstacle() {
       this.useFontAwesomeCursor("\uf05e");
@@ -386,9 +378,9 @@ export default {
   border-image: repeating-linear-gradient(
       -45deg,
       yellow 0,
-      yellow 1em,
+      yellow 10px,
       black 0,
-      black 2em
+      black 20px
     )
     5;
 }

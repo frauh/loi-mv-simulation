@@ -36,7 +36,7 @@
       @toggle="callEditObstacles"
     />
   </div>
-  <VueModal v-model="showBackgroundModal" title="Untergrund bearbeiten">
+  <VueModal v-model="showBackgroundModal" title="Untergrund">
     <div class="modal-column">
       <div class="modal-row">
         <input
@@ -133,7 +133,7 @@
       </div>
     </div>
   </VueModal>
-  <VueModal v-model="showObstacleModal" title="Hindernisse bearbeiten">
+  <VueModal v-model="showObstacleModal" title="Hindernisse">
     <div class="modal-column">
       <div class="modal-row">
         <ControlButton

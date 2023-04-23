@@ -95,7 +95,6 @@ export default class Simulation {
 
   stop() {
     while (this._workers.length > 0) {
-      console.log(1);
       this._workers.pop().terminate();
     }
   }

@@ -102,14 +102,7 @@ export default {
     // this.$refs.simulationArea.drawVehicleModel(vehicle);
 
     let robo = new Vehicle("blue", "robo");
-    robo.program = parseProgramCode(
-      "basic.forever(function () {\n" +
-        "    LOI_MV.antrieb(10, 0)\n" +
-        "    basic.pause(1000)\n" +
-        "    LOI_MV.antrieb(0, 0)\n" +
-        "    basic.pause(5000)\n" +
-        "})"
-    );
+    robo.program = parseProgramCode("LOI_MV.antrieb(10, 0)\n");
     this.vehicles.set(robo.id, robo);
     this.$refs.simulationArea.drawVehicleModel(robo);
   },
@@ -301,18 +294,21 @@ export default {
         .forEach((obstacle) =>
           obstacles.push({
             type: obstacle.getClassName(),
-            position: obstacle.position(),
-            width: obstacle.width() * obstacle.scaleX(),
-            height: obstacle.height() * obstacle.scaleY(),
-            rotation: obstacle.rotation(),
+            center: obstacle.position(),
+            width: (obstacle.width() * obstacle.scaleX()) / 2,
+            height: (obstacle.height() * obstacle.scaleY()) / 2,
+            rotation: (obstacle.rotation() + 360) % 360,
           })
         );
       if (this.simulationAreaBorderAsObstacle) {
         obstacles.push({
           type: "Rect",
-          position: { x: 0, y: 0 },
-          width: this.vehicleLayer.width(),
-          height: this.vehicleLayer.height(),
+          center: {
+            x: this.vehicleLayer.width() / 2,
+            y: this.vehicleLayer.height() / 2,
+          },
+          width: this.vehicleLayer.width() / 2,
+          height: this.vehicleLayer.height() / 2,
           rotation: 0,
         });
       }

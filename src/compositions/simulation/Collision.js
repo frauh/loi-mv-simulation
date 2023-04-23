@@ -8,37 +8,41 @@ export default class Collision {
       let rotation = toRadian(obstacle.rotation);
       switch (obstacle.type) {
         case "Circle":
-          circles.push(new Circle(obstacle.position, obstacle.width / 2));
+          circles.push(new Circle(obstacle.center, obstacle.width));
           break;
         case "Rect":
           lines.push(
             new Line(
-              obstacle.position.x,
-              obstacle.position.y,
-              obstacle.position.x + obstacle.width,
-              obstacle.position.y,
-              rotation
+              -obstacle.width,
+              -obstacle.height,
+              +obstacle.width,
+              -obstacle.height,
+              rotation,
+              obstacle.center
             ),
             new Line(
-              obstacle.position.x,
-              obstacle.position.y,
-              obstacle.position.x,
-              obstacle.position.y + obstacle.height,
-              rotation
+              +obstacle.width,
+              -obstacle.height,
+              +obstacle.width,
+              +obstacle.height,
+              rotation,
+              obstacle.center
             ),
             new Line(
-              obstacle.position.x + obstacle.width,
-              obstacle.position.y + obstacle.height,
-              obstacle.position.x + obstacle.width,
-              obstacle.position.y,
-              rotation
+              +obstacle.width,
+              +obstacle.height,
+              -obstacle.width,
+              +obstacle.height,
+              rotation,
+              obstacle.center
             ),
             new Line(
-              obstacle.position.x + obstacle.width,
-              obstacle.position.y + obstacle.height,
-              obstacle.position.x,
-              obstacle.position.y + obstacle.height,
-              rotation
+              -obstacle.width,
+              +obstacle.height,
+              -obstacle.width,
+              -obstacle.height,
+              rotation,
+              obstacle.center
             )
           );
           break;
@@ -72,92 +76,116 @@ export default class Collision {
    */
   #mapVehicle(pose) {
     let rotation = toRadian(pose.theta);
-    let x = toPixel(pose.x);
-    let y = toPixel(pose.y);
-    let width = toPixel(vehicleConst.width / 2);
-    let height = toPixel(vehicleConst.height / 2);
-    let bodyHeight = toPixel(vehicleConst.bodyHeight / 2);
+    let x = toPixel(pose.x + Math.cos(rotation) * vehicleConst.rotationOffset);
+    let y = toPixel(pose.y + Math.sin(rotation) * vehicleConst.rotationOffset);
+    let widthHalf = toPixel(vehicleConst.width / 2);
+    let heightHalf = toPixel(vehicleConst.height / 2);
+    let bodyHeightHalf = toPixel(vehicleConst.bodyHeight / 2);
     let wheelFrontDistance = toPixel(vehicleConst.wheelFrontDistance);
     let wheelRearDistance = toPixel(vehicleConst.wheelRearDistance);
     return [
       // Frontstoßstange
-      new Line(x + width, y + bodyHeight, x + width, y - bodyHeight, rotation),
+      new Line(
+        +widthHalf,
+        +bodyHeightHalf,
+        +widthHalf,
+        -bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
+      ),
       // Heckstoßstange
-      new Line(x - width, y + bodyHeight, x - width, y - bodyHeight, rotation),
+      new Line(
+        -widthHalf,
+        +bodyHeightHalf,
+        -widthHalf,
+        -bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
+      ),
       // Kotflügel vorne
       new Line(
-        x + width,
-        y + bodyHeight,
-        x + width - wheelFrontDistance,
-        y + bodyHeight,
-        rotation
+        +widthHalf,
+        +bodyHeightHalf,
+        +widthHalf - wheelFrontDistance,
+        +bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       new Line(
-        x + width,
-        y - bodyHeight,
-        x + width - wheelFrontDistance,
-        y - bodyHeight,
-        rotation
+        +widthHalf,
+        -bodyHeightHalf,
+        +widthHalf - wheelFrontDistance,
+        -bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       // Kotflügel hinten
       new Line(
-        x - width,
-        y + bodyHeight,
-        x - width + wheelRearDistance,
-        y + bodyHeight,
-        rotation
+        -widthHalf,
+        +bodyHeightHalf,
+        -widthHalf + wheelRearDistance,
+        +bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       new Line(
-        x - width,
-        y - bodyHeight,
-        x - width + wheelRearDistance,
-        y - bodyHeight,
-        rotation
+        -widthHalf,
+        -bodyHeightHalf,
+        -widthHalf + wheelRearDistance,
+        -bodyHeightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       // Radüberstand vorne
       new Line(
-        x + width - wheelFrontDistance,
-        y + bodyHeight,
-        x + width - wheelFrontDistance,
-        y + height,
-        rotation
+        +widthHalf - wheelFrontDistance,
+        +bodyHeightHalf,
+        +widthHalf - wheelFrontDistance,
+        +heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       new Line(
-        x + width - wheelFrontDistance,
-        y - bodyHeight,
-        x + width - wheelFrontDistance,
-        y - height,
-        rotation
+        +widthHalf - wheelFrontDistance,
+        -bodyHeightHalf,
+        +widthHalf - wheelFrontDistance,
+        -heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       // Radüberstand hinten
       new Line(
-        x - width + wheelRearDistance,
-        y + bodyHeight,
-        x - width + wheelRearDistance,
-        y + height,
-        rotation
+        -widthHalf + wheelRearDistance,
+        +bodyHeightHalf,
+        -widthHalf + wheelRearDistance,
+        +heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       new Line(
-        x - width + wheelRearDistance,
-        y - bodyHeight,
-        x - width + wheelRearDistance,
-        y - height,
-        rotation
+        -widthHalf + wheelRearDistance,
+        -bodyHeightHalf,
+        -widthHalf + wheelRearDistance,
+        -heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       // ein großer Radkasten
       new Line(
-        x + width - wheelFrontDistance,
-        y + height,
-        x - width + wheelRearDistance,
-        y + height,
-        rotation
+        +widthHalf - wheelFrontDistance,
+        +heightHalf,
+        -widthHalf + wheelRearDistance,
+        +heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
       new Line(
-        x + width - wheelFrontDistance,
-        y - height,
-        x - width + wheelRearDistance,
-        y - height,
-        rotation
+        +widthHalf - wheelFrontDistance,
+        -heightHalf,
+        -widthHalf + wheelRearDistance,
+        -heightHalf,
+        rotation,
+        { x: x, y: y }
       ),
     ];
   }
@@ -169,16 +197,21 @@ export default class Collision {
    */
   #hasCircleIntersection(line) {
     for (let circle of this._circles) {
-      let distance =
-        Math.abs(
-          (line.b.x - line.a.x) * (line.a.y - circle.center.y) -
-            (line.a.x - circle.center.x) * (line.b.y - line.a.y)
-        ) /
-        Math.sqrt(
-          Math.pow(line.b.x - line.a.x, 2) + Math.pow(line.b.y - line.a.y, 2)
-        );
+      const a = line.a.y - line.b.y;
+      const b = line.b.x - line.a.x;
+      const c =
+        (line.a.x - line.b.x) * line.a.y + line.a.x * (line.b.y - line.a.y);
+      const distance =
+        Math.abs(a * circle.center.x + b * circle.center.y + c) /
+        Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
       if (distance <= circle.radius) {
-        return true;
+        const x =
+          (b * (b * circle.center.x - a * circle.center.y) - a * c) /
+          (Math.pow(a, 2) + Math.pow(b, 2));
+        const y =
+          (a * (-b * circle.center.x + a * circle.center.y) - b * c) /
+          (Math.pow(a, 2) + Math.pow(b, 2));
+        return this.#isPointOnLine(line, { x: x, y: y });
       }
     }
     return false;
@@ -231,7 +264,7 @@ export default class Collision {
   }
 
   /**
-   * Prüft, ob ein Punkt auf der Geraden AB liegt.
+   * Prüft, ob ein Punkt auf der Geraden AB zwischen den A und B liegt.
    * @param {Line} line Gerade
    * @param {{x: number, y: number}} point zu überprüfender Punkt
    * @returns {boolean}
@@ -239,9 +272,9 @@ export default class Collision {
   #isPointOnLine(line, point) {
     return (
       point.x <= Math.max(line.a.x, line.b.x) &&
-      point.x <= Math.min(line.a.x, line.b.x) &&
+      point.x >= Math.min(line.a.x, line.b.x) &&
       point.y <= Math.max(line.a.y, line.b.y) &&
-      point.y <= Math.min(line.a.y, line.b.y)
+      point.y >= Math.min(line.a.y, line.b.y)
     );
   }
 }
@@ -249,24 +282,29 @@ export default class Collision {
 class Line {
   /**
    * Erstellt eine Gerade AB
-   * @param aX Punkt A ohne Rotation
-   * @param aY Punkt A ohne Rotation
-   * @param bX Punkt B ohne Rotation
-   * @param bY Punkt B ohne Rotation
-   * @param rotation Radiant
+   * @param {number} aX Punkt A Entfernung x-Achse zum Zentrum
+   * @param {number} aY Punkt A Entfernung y-Achse zum Zentrum
+   * @param {number} bX Punkt B Entfernung x-Achse zum Zentrum
+   * @param {number} bY Punkt B Entfernung y-Achse zum Zentrum
+   * @param {number} rotation Radiant
+   * @param {{x: number, y: number}} rotationCenter
    */
-  constructor(aX, aY, bX, bY, rotation = 0) {
-    const xRotationFaktor = Math.cos(rotation);
-    const yRotationFaktor = Math.sin(rotation);
-    this._a = {
-      x: aX * xRotationFaktor + aX * yRotationFaktor,
-      y: aY * xRotationFaktor + aY * yRotationFaktor,
-    };
-    this._b = {
-      x: bX * xRotationFaktor + bX * yRotationFaktor,
-      y: bY * xRotationFaktor + bY * yRotationFaktor,
-    };
-    this._rotation = rotation;
+  constructor(aX, aY, bX, bY, rotation, rotationCenter) {
+    if (!rotationCenter) {
+      this._a = { x: aX, y: aY };
+      this._b = { x: bX, y: bY };
+    } else {
+      const cos = Math.cos(rotation);
+      const sin = Math.sin(rotation);
+      this._a = {
+        x: aX * cos - aY * sin + rotationCenter.x,
+        y: aX * sin + aY * cos + rotationCenter.y,
+      };
+      this._b = {
+        x: bX * cos - bY * sin + rotationCenter.x,
+        y: bX * sin + bY * cos + rotationCenter.y,
+      };
+    }
   }
 
   get a() {
@@ -281,8 +319,8 @@ class Line {
 class Circle {
   /**
    * Modelliert einen Kreis
-   * @param {{x, y}} Mittelpunkt
-   * @param radius Radius
+   * @param {{x: number, y: number}} Mittelpunkt
+   * @param {number} radius Radius
    */
   constructor({ x, y }, radius) {
     this._center = { x, y };
