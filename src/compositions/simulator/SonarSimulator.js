@@ -10,6 +10,10 @@ export default class SonarSimulator extends SonarMapper {
    */
   _maxDistance;
 
+  set pose(value) {
+    this._pose = value;
+  }
+
   constructor(pose, obstacles) {
     super();
     this._pose = pose;
@@ -76,39 +80,30 @@ export default class SonarSimulator extends SonarMapper {
 
   /**
    * Identifiziert Punkte auf dem Rand des Vierecks und fügt diese this._obstacleBorder hinzu. In Pixel
-   * @param {{x: number, y: number}} center Koordinate der linken oberen Ecke des ungedrehten Vierecks
-   * @param {number} width Breite des Vierecks
-   * @param {number} height Höhe des Vierecks
+   * @param {{x: number, y: number}} center Koordinate des Zentrums des Vierecks
+   * @param {number} width halbe Breite des Vierecks
+   * @param {number} height halbe Höhe des Vierecks
    * @param {number} rotation Winkel, um den das Viereck gedreht ist in Grad
    */
   #addRectangleBorder(center, width, height, rotation) {
-    rotation = toRadian(rotation);
-    const topLeft = { x: center.x - width, y: center.y - height };
-    const bottomRight = { x: center.x + width, y: center.y + height };
-    const xRotationFaktor = Math.cos(rotation);
-    const yRotationFaktor = Math.sin(rotation);
-    for (let i = topLeft.x; i < bottomRight.x; i++) {
+    const cos = Math.cos(toRadian(rotation));
+    const sin = Math.sin(toRadian(rotation));
+    function rotatedPoint(x, y) {
+      return {
+        x: x * cos - y * sin + center.x,
+        y: x * sin + y * cos + center.y,
+      };
+    }
+    for (let i = -width; i < width; i++) {
       this._obstacleBorders.push(
-        {
-          x: i * xRotationFaktor + i * yRotationFaktor,
-          y: topLeft.y * xRotationFaktor + topLeft.y * yRotationFaktor,
-        },
-        {
-          x: i * xRotationFaktor + i * yRotationFaktor,
-          y: bottomRight.y * xRotationFaktor + bottomRight.y * yRotationFaktor,
-        }
+        rotatedPoint(i, -height),
+        rotatedPoint(i, height)
       );
     }
-    for (let i = topLeft.y; i < bottomRight.y; i++) {
+    for (let i = -height; i < height; i++) {
       this._obstacleBorders.push(
-        {
-          x: topLeft.x * xRotationFaktor + topLeft.x * yRotationFaktor,
-          y: i * xRotationFaktor + i * yRotationFaktor,
-        },
-        {
-          x: bottomRight.x * xRotationFaktor + bottomRight.x * yRotationFaktor,
-          y: i * xRotationFaktor + i * yRotationFaktor,
-        }
+        rotatedPoint(-width, i),
+        rotatedPoint(width, i)
       );
     }
   }
@@ -162,7 +157,7 @@ export default class SonarSimulator extends SonarMapper {
    * Der Punkt liegt innerhalb eines Polygons, wenn die Anzahl der Schnitte des Strahls,
    * der vom Punkt ausgeht, ungerade ist -> Jordansches Kurventheorem.
    * Rechnet mit Pixel.
-   * @param {{x: number, y: number}[]} polygon Koordinaten, die ei Polygon aufspannen
+   * @param {{x: number, y: number}[]} polygon Koordinaten, die ein Polygon aufspannen
    * @param {{x: number, y: number}} proof Punkt, der überprüft werden soll
    */
   #polygonContainsPoint(polygon, proof) {

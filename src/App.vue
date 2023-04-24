@@ -102,7 +102,13 @@ export default {
     // this.$refs.simulationArea.drawVehicleModel(vehicle);
 
     let robo = new Vehicle("blue", "robo");
-    robo.program = parseProgramCode("LOI_MV.antrieb(10, 0)\n");
+    robo.program = parseProgramCode(
+      "LOI_MV.antrieb(2, 0)\n" +
+        "loops.everyInterval(500, function () {\n" +
+        // '    basic.showString("links " + LOI_MV.helligkeitLinks() + ", " + "rechts: " + LOI_MV.helligkeitRechts())\n' +
+        '    basic.showString("Hindernis " + LOI_MV.ultraschall() + "cm")\n' +
+        "})"
+    );
     this.vehicles.set(robo.id, robo);
     this.$refs.simulationArea.drawVehicleModel(robo);
   },

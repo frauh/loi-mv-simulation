@@ -145,6 +145,7 @@ export default class LoiMvSimulator extends LoiMvMapper {
       vR
     );
     this.commit(WorkerMessageKey.pose, this._pose);
+    this._sonar.pose = this._pose;
     if (this._collision.happened(this._pose)) {
       this.commit(WorkerMessageKey.collision, true);
     }

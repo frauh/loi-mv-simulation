@@ -174,7 +174,10 @@
             id="checkbox"
             v-model="this.$parent.$data.simulationAreaBorderAsObstacle"
           />
-          <div class="check-slider round"></div>
+          <div
+            class="check-slider round"
+            @click="showObstacleModal = false"
+          ></div>
         </label>
       </div>
     </div>

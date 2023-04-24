@@ -66,7 +66,7 @@ export default {
   },
   created() {
     require
-      .context("@/assets/", true, /^.*\.png$/)
+      .context("@/assets/", true, /side.*\.png$/)
       .keys()
       .forEach((name) => {
         this.colors.add(

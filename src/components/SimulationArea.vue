@@ -272,7 +272,7 @@ export default {
         });
         obstacle.on("transform", () =>
           obstacle.setAttrs({
-            fillPatternRotation: -obstacle.rotation() - 45,
+            fillPatternRotation: obstacle.rotation() - 45,
             fillPatternScale: {
               x: 1 / obstacle.scaleX(),
               y: 1 / obstacle.scaleY(),

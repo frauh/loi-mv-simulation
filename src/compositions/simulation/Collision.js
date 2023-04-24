@@ -294,17 +294,19 @@ class Line {
       this._a = { x: aX, y: aY };
       this._b = { x: bX, y: bY };
     } else {
-      const cos = Math.cos(rotation);
-      const sin = Math.sin(rotation);
-      this._a = {
-        x: aX * cos - aY * sin + rotationCenter.x,
-        y: aX * sin + aY * cos + rotationCenter.y,
-      };
-      this._b = {
-        x: bX * cos - bY * sin + rotationCenter.x,
-        y: bX * sin + bY * cos + rotationCenter.y,
-      };
+      this._rotationCenter = rotationCenter;
+      this._cos = Math.cos(rotation);
+      this._sin = Math.sin(rotation);
+      this._a = this.#rotatedPoint(aX, aY);
+      this._b = this.#rotatedPoint(bX, bY);
     }
+  }
+
+  #rotatedPoint(x, y) {
+    return {
+      x: x * this._cos - y * this._sin + this._rotationCenter.x,
+      y: x * this._sin + y * this._cos + this._rotationCenter.y,
+    };
   }
 
   get a() {
