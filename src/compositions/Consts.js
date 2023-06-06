@@ -4,6 +4,7 @@
 
 /**
  * Breite des Simulationsbereichs
+ * Wird benötigt, um das Umrechnungsverhältnis Pixel-Meter zu berechnen
  * @type {number} Pixel
  */
 export let stageWidth;
@@ -17,8 +18,7 @@ export function setStageWidth(pixel) {
 }
 
 /**
- * Versatz, der bei allen sich wiederholenden Blöcken verwendet wird
- * als minimales Zeitintervall zwischen den Iterationen.
+ * Versatz, der bei allen sich wiederholenden Blöcken verwendet wird als minimales Zeitintervall zwischen den Iterationen.
  * Der Start einer neuen Iteration ist unabhängig davon, ob die vorherige schon beendet worden ist.
  * Ggf. ist der Wert also anzupassen, wenn ein durchlauf länger dauert.
  * Beispiel:
@@ -147,10 +147,10 @@ export const sonarConst = {
   measurementAngle: 15,
 
   /**
-   * Warum auch immer gibt der Sensor weniger cm zurück als er sollte
-   * @type {number} Factor
+   * Warum auch immer gibt der Sensor weniger cm zurück als er sollte,
+   * @type {number} Faktor z.B. 2/3
    */
-  inaccuracy: 2 / 3,
+  inaccuracy: 1,
 };
 
 export const neoPixelConst = {

@@ -59,8 +59,8 @@ export default class SonarSimulator extends SonarMapper {
     }
     minDistance = minDistance * sonarConst.inaccuracy;
     return unit === PingUnit.Inches
-      ? (minDistance - sonarConst.offset) * 39.37008
-      : (minDistance - sonarConst.offset) * 100;
+      ? ~~(0.5 + (minDistance - sonarConst.offset) * 39.37008)
+      : ~~(0.5 + (minDistance - sonarConst.offset) * 100);
   }
 
   /**

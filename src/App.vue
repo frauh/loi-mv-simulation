@@ -61,7 +61,6 @@ import Simulation from "@/compositions/simulation/Simulation";
 import parseProgramCode from "@/compositions/Parser";
 import Konva from "konva";
 import { neoPixelConst, toPixel } from "@/compositions/Consts";
-import Vehicle from "@/compositions/Vehicle";
 
 export default {
   name: "App",
@@ -87,31 +86,31 @@ export default {
       animation: null,
     };
   },
-  mounted() {
-    //TODO for testing
-    // let vehicle = new Vehicle("red", "test");
-    // vehicle.program = parseProgramCode(
-    //   "basic.forever(function () {\n" +
-    //     "    LOI_MV.antrieb(10, 0)\n" +
-    //     "    basic.pause(1000)\n" +
-    //     "    LOI_MV.antrieb(0, 0)\n" +
-    //     "    basic.pause(5000)\n" +
-    //     "})"
-    // );
-    // this.vehicles.set(vehicle.id, vehicle);
-    // this.$refs.simulationArea.drawVehicleModel(vehicle);
-
-    let robo = new Vehicle("blue", "robo");
-    robo.program = parseProgramCode(
-      "LOI_MV.antrieb(2, 0)\n" +
-        "loops.everyInterval(500, function () {\n" +
-        // '    basic.showString("links " + LOI_MV.helligkeitLinks() + ", " + "rechts: " + LOI_MV.helligkeitRechts())\n' +
-        '    basic.showString("Hindernis " + LOI_MV.ultraschall() + "cm")\n' +
-        "})"
-    );
-    this.vehicles.set(robo.id, robo);
-    this.$refs.simulationArea.drawVehicleModel(robo);
-  },
+  // for testing
+  // mounted() {
+  // let vehicle = new Vehicle("red", "test");
+  // vehicle.program = parseProgramCode(
+  //   "basic.forever(function () {\n" +
+  //     "    LOI_MV.antrieb(10, 0)\n" +
+  //     "    basic.pause(1000)\n" +
+  //     "    LOI_MV.antrieb(0, 0)\n" +
+  //     "    basic.pause(5000)\n" +
+  //     "})"
+  // );
+  // this.vehicles.set(vehicle.id, vehicle);
+  // this.$refs.simulationArea.drawVehicleModel(vehicle);
+  //
+  // let robo = new Vehicle("blue", "robo");
+  // robo.program = parseProgramCode(
+  //   "LOI_MV.antrieb(2, 0)\n" +
+  //     "loops.everyInterval(500, function () {\n" +
+  //     // '    basic.showString("links " + LOI_MV.helligkeitLinks() + ", " + "rechts: " + LOI_MV.helligkeitRechts())\n' +
+  //     '    basic.showString("Hindernis " + LOI_MV.ultraschall() + "cm")\n' +
+  //     "})"
+  // );
+  // this.vehicles.set(robo.id, robo);
+  // this.$refs.simulationArea.drawVehicleModel(robo);
+  // },
   updated() {
     if (
       !this.simulation.isRunning &&
@@ -123,6 +122,7 @@ export default {
   },
   methods: {
     runSimulation() {
+      this.stopSimulation();
       this.vehicleTraces.forEach((trace) => trace.points([]));
       this.animation = new Konva.Animation(
         this.createAnimation,
@@ -170,6 +170,8 @@ export default {
       });
     },
     stopSimulation() {
+      this.stopManipulatingBackground();
+      this.stopRemovingObstacles();
       this.simulation.stop();
       if (this.animation && this.animation.isRunning) {
         this.animation.stop();
@@ -188,10 +190,12 @@ export default {
       });
     },
     addVehicle(vehicle) {
+      this.stopSimulation();
       this.vehicles.set(vehicle.id, vehicle);
       this.$refs.simulationArea.drawVehicleModel(vehicle);
     },
     deleteVehicle(id) {
+      this.stopSimulation();
       this.vehicles.delete(id);
       this.vehicleModels.get(id).destroy();
       this.vehicleModels.delete(id);
@@ -202,6 +206,7 @@ export default {
       this.vehicles.get(id).isTracked = !this.vehicles.get(id).isTracked;
     },
     async programUpload(id, file) {
+      this.stopSimulation();
       await readMakeCodeFileAsynchronous(file).then(
         (result) => (this.vehicles.get(id).program = parseProgramCode(result))
       );
